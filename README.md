@@ -1,2 +1,2 @@
 # TCNJ_ResearchPCBs 
-PCBs created for research projects and development during my time in multiple labs.
+Research notes, code, and PCBs created for research projects and development during my time at multiple labs. Check out the wiki for more info!
