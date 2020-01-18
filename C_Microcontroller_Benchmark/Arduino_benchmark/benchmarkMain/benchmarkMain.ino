@@ -1,3 +1,12 @@
+/**
+Benchmark for PSoC 4,5,6 vs Arduino comparison
+Simple add-multiply benchmark for microcontrollers, timing of runs done with stopwatch
+Can be extended to use internal timers later
+
+Authors: Jordan Sinoway, Dr. Larry Pearlstein
+TCNJ
+1/14/2020
+**/
 #include <stdint.h>
 #include <stdio.h>
 
