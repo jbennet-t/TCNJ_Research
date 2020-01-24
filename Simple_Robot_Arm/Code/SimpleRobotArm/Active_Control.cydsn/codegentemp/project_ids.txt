@@ -1,0 +1,7 @@
+C:\Users\sinow\Documents\PSoC Creator\Lab 5 - Final Project\Servo_PWM.cydsn\Servo_PWM.cyprj|07f69a70-a855-4296-b1e5-06d201cdf675
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|91c59564-c716-4a35-a1d3-0b99263c271d
+C:\Users\sinow\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Downloads ( 4.2).cyprj|2843fc87-bb41-48ca-834a-bbff97f9f29e
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|41ac9a8b-1fa7-4576-933d-da80399e2afd
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|f12d1557-97ba-49bd-9bb9-f56fcba86d02
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|ff7fe167-5819-4c87-ad3f-f824eb91e06b
+C:\Users\sinow\Documents\PSoC Creator\Lab 5 - Final Project\Pot_Control.cydsn\Pot_Control.cyprj|f33f63ad-09dc-4dec-bd7b-91fe6e86fcb6

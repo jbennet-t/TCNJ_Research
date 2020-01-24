@@ -1,0 +1,3237 @@
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.CapSense_DisplayState,"ax",%progbits
+  20              		.align	2
+  21              		.global	CapSense_DisplayState
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	CapSense_DisplayState, %function
+  25              	CapSense_DisplayState:
+  26              	.LFB64:
+  27              		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        **** ELC 343 - Microcomputer Lab Final Project
+   3:main.c        **** November 19, 2019
+   4:main.c        **** Goal: controlling 3 servos and stepper motor to form a simple 
+   5:main.c        **** 3-DOF robot arm, using touch sensor and potentiometer inputs
+   6:main.c        **** Authors: Jordan Sinoway & Caleb McKinney
+   7:main.c        **** */
+   8:main.c        **** 
+   9:main.c        **** 
+  10:main.c        **** 
+  11:main.c        **** #include "project.h"
+  12:main.c        **** #include "stdio.h"
+  13:main.c        **** #include "string.h"
+  14:main.c        **** #include "math.h"
+  15:main.c        **** 
+  16:main.c        **** 
+  17:main.c        **** #define STEP_DELAY (2) //defining global delay for stepper motor
+  18:main.c        **** 
+  19:main.c        **** 
+  20:main.c        **** uint16 curPos, oldPos;
+  21:main.c        **** 
+  22:main.c        **** uint16 CapSense_DisplayState(void)
+  23:main.c        **** {
+  28              		.loc 1 23 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 3, -8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 2
+
+
+  35              		.cfi_offset 14, -4
+  24:main.c        ****     curPos = CapSense_CSD_GetCentroidPos(CapSense_CSD_LINEARSLIDER0__LS); //find slider position
+  36              		.loc 1 24 0
+  37 0002 0020     		movs	r0, #0
+  38 0004 FFF7FEFF 		bl	CapSense_CSD_GetCentroidPos
+  39              	.LVL0:
+  40 0008 014B     		ldr	r3, .L3
+  41 000a 1880     		strh	r0, [r3]	@ movhi
+  25:main.c        ****     
+  26:main.c        ****     /*
+  27:main.c        ****     if(curPos == 0xFFFFu) //reset position
+  28:main.c        ****     {
+  29:main.c        ****         curPos = 0u;
+  30:main.c        ****     }
+  31:main.c        ****     */
+  32:main.c        ****     
+  33:main.c        ****     return curPos;
+  34:main.c        ****     
+  35:main.c        **** }
+  42              		.loc 1 35 0
+  43 000c 08BD     		pop	{r3, pc}
+  44              	.L4:
+  45 000e 00BF     		.align	2
+  46              	.L3:
+  47 0010 00000000 		.word	curPos
+  48              		.cfi_endproc
+  49              	.LFE64:
+  50              		.size	CapSense_DisplayState, .-CapSense_DisplayState
+  51              		.section	.text.stepper,"ax",%progbits
+  52              		.align	2
+  53              		.global	stepper
+  54              		.thumb
+  55              		.thumb_func
+  56              		.type	stepper, %function
+  57              	stepper:
+  58              	.LFB65:
+  36:main.c        **** 
+  37:main.c        **** 
+  38:main.c        **** void stepper(int a, int b, int c, int d, int delay)
+  39:main.c        **** {
+  59              		.loc 1 39 0
+  60              		.cfi_startproc
+  61              		@ args = 4, pretend = 0, frame = 0
+  62              		@ frame_needed = 0, uses_anonymous_args = 0
+  63              	.LVL1:
+  64 0000 70B5     		push	{r4, r5, r6, lr}
+  65              		.cfi_def_cfa_offset 16
+  66              		.cfi_offset 4, -16
+  67              		.cfi_offset 5, -12
+  68              		.cfi_offset 6, -8
+  69              		.cfi_offset 14, -4
+  70 0002 0E46     		mov	r6, r1
+  71 0004 1546     		mov	r5, r2
+  72 0006 1C46     		mov	r4, r3
+  40:main.c        ****     A_Write(a);
+  73              		.loc 1 40 0
+  74 0008 C0B2     		uxtb	r0, r0
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 3
+
+
+  75              	.LVL2:
+  76 000a FFF7FEFF 		bl	A_Write
+  77              	.LVL3:
+  41:main.c        ****     B_Write(b);
+  78              		.loc 1 41 0
+  79 000e F0B2     		uxtb	r0, r6
+  80 0010 FFF7FEFF 		bl	B_Write
+  81              	.LVL4:
+  42:main.c        ****     C_Write(c);
+  82              		.loc 1 42 0
+  83 0014 E8B2     		uxtb	r0, r5
+  84 0016 FFF7FEFF 		bl	C_Write
+  85              	.LVL5:
+  43:main.c        ****     D_Write(d);
+  86              		.loc 1 43 0
+  87 001a E0B2     		uxtb	r0, r4
+  88 001c FFF7FEFF 		bl	D_Write
+  89              	.LVL6:
+  44:main.c        ****     CyDelay(delay);
+  90              		.loc 1 44 0
+  91 0020 0498     		ldr	r0, [sp, #16]
+  92 0022 FFF7FEFF 		bl	CyDelay
+  93              	.LVL7:
+  94 0026 70BD     		pop	{r4, r5, r6, pc}
+  95              		.cfi_endproc
+  96              	.LFE65:
+  97              		.size	stepper, .-stepper
+  98              		.section	.text.range_map,"ax",%progbits
+  99              		.align	2
+ 100              		.global	range_map
+ 101              		.thumb
+ 102              		.thumb_func
+ 103              		.type	range_map, %function
+ 104              	range_map:
+ 105              	.LFB66:
+  45:main.c        **** }
+  46:main.c        **** 
+  47:main.c        **** 
+  48:main.c        **** int range_map(int x, int a, int b, int c, int d) // y = (x-a)((d-c)/(b-a)) + c   | range [a,b] | ra
+  49:main.c        **** {
+ 106              		.loc 1 49 0
+ 107              		.cfi_startproc
+ 108              		@ args = 4, pretend = 0, frame = 0
+ 109              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110              		@ link register save eliminated.
+ 111              	.LVL8:
+ 112 0000 10B4     		push	{r4}
+ 113              		.cfi_def_cfa_offset 4
+ 114              		.cfi_offset 4, -4
+  50:main.c        ****     int mapped_out;                              //mapping function to convert 0-255 ADC (8-bit) ou
+  51:main.c        ****     
+  52:main.c        ****     mapped_out = ((x - a)*(d - c)/(b - a)) + c;
+ 115              		.loc 1 52 0
+ 116 0002 401A     		subs	r0, r0, r1
+ 117              	.LVL9:
+ 118 0004 019C     		ldr	r4, [sp, #4]
+ 119 0006 E41A     		subs	r4, r4, r3
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 4
+
+
+ 120 0008 04FB00F0 		mul	r0, r4, r0
+ 121 000c 521A     		subs	r2, r2, r1
+ 122              	.LVL10:
+ 123 000e 90FBF2F0 		sdiv	r0, r0, r2
+ 124              	.LVL11:
+  53:main.c        ****     
+  54:main.c        ****     return mapped_out;
+  55:main.c        **** }
+ 125              		.loc 1 55 0
+ 126 0012 1844     		add	r0, r0, r3
+ 127              	.LVL12:
+ 128 0014 10BC     		pop	{r4}
+ 129              		.cfi_restore 4
+ 130              		.cfi_def_cfa_offset 0
+ 131              	.LVL13:
+ 132 0016 7047     		bx	lr
+ 133              		.cfi_endproc
+ 134              	.LFE66:
+ 135              		.size	range_map, .-range_map
+ 136              		.section	.text.main,"ax",%progbits
+ 137              		.align	2
+ 138              		.global	main
+ 139              		.thumb
+ 140              		.thumb_func
+ 141              		.type	main, %function
+ 142              	main:
+ 143              	.LFB67:
+  56:main.c        **** 
+  57:main.c        **** int main(void)
+  58:main.c        **** {
+ 144              		.loc 1 58 0
+ 145              		.cfi_startproc
+ 146              		@ args = 0, pretend = 0, frame = 256
+ 147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 148 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 149              		.cfi_def_cfa_offset 28
+ 150              		.cfi_offset 4, -28
+ 151              		.cfi_offset 5, -24
+ 152              		.cfi_offset 6, -20
+ 153              		.cfi_offset 7, -16
+ 154              		.cfi_offset 8, -12
+ 155              		.cfi_offset 9, -8
+ 156              		.cfi_offset 14, -4
+ 157 0004 C3B0     		sub	sp, sp, #268
+ 158              		.cfi_def_cfa_offset 296
+  59:main.c        ****     CyGlobalIntEnable; 
+ 159              		.loc 1 59 0
+ 160              		.syntax unified
+ 161              	@ 59 "main.c" 1
+ 162 0006 62B6     		CPSIE   i
+ 163              	@ 0 "" 2
+  60:main.c        ****     
+  61:main.c        ****     LCD_Char_1_Start();//initalizing lcd
+ 164              		.loc 1 61 0
+ 165              		.thumb
+ 166              		.syntax unified
+ 167 0008 FFF7FEFF 		bl	LCD_Char_1_Start
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 5
+
+
+ 168              	.LVL14:
+  62:main.c        ****     char lcdOutput[256];//string for lcd display
+  63:main.c        ****     
+  64:main.c        ****     PWM_1_Start(); //start PWM block 1
+ 169              		.loc 1 64 0
+ 170 000c FFF7FEFF 		bl	PWM_1_Start
+ 171              	.LVL15:
+  65:main.c        ****     ADC_SAR_1_Start(); //start SAR ADC 1
+ 172              		.loc 1 65 0
+ 173 0010 FFF7FEFF 		bl	ADC_SAR_1_Start
+ 174              	.LVL16:
+  66:main.c        ****     PWM_2_Start(); //start PWM block 2
+ 175              		.loc 1 66 0
+ 176 0014 FFF7FEFF 		bl	PWM_2_Start
+ 177              	.LVL17:
+  67:main.c        ****     ADC_SAR_2_Start(); //start SAR ADC 2
+ 178              		.loc 1 67 0
+ 179 0018 FFF7FEFF 		bl	ADC_SAR_2_Start
+ 180              	.LVL18:
+  68:main.c        ****     ADC_DelSig_1_Start();
+ 181              		.loc 1 68 0
+ 182 001c FFF7FEFF 		bl	ADC_DelSig_1_Start
+ 183              	.LVL19:
+  69:main.c        ****     PWM_3_Start();
+ 184              		.loc 1 69 0
+ 185 0020 FFF7FEFF 		bl	PWM_3_Start
+ 186              	.LVL20:
+  70:main.c        ****     
+  71:main.c        ****     CapSense_CSD_Start();
+ 187              		.loc 1 71 0
+ 188 0024 FFF7FEFF 		bl	CapSense_CSD_Start
+ 189              	.LVL21:
+  72:main.c        ****     CapSense_CSD_InitializeAllBaselines();
+ 190              		.loc 1 72 0
+ 191 0028 FFF7FEFF 		bl	CapSense_CSD_InitializeAllBaselines
+ 192              	.LVL22:
+  73:main.c        ****     
+  74:main.c        ****  
+  75:main.c        ****     
+  76:main.c        ****     int val1; //initial adc output val
+  77:main.c        ****     int val2;
+  78:main.c        ****     int val3;
+  79:main.c        ****     
+  80:main.c        ****     int stepPos = 0;
+ 193              		.loc 1 80 0
+ 194 002c 0025     		movs	r5, #0
+ 195              	.LVL23:
+ 196              	.L13:
+  81:main.c        ****     int targetPos = 0;
+  82:main.c        ****     
+  83:main.c        ****     int mapped_val1; //val post mapping
+  84:main.c        ****     int mapped_val2;
+  85:main.c        ****     int mapped_val3;
+  86:main.c        ****      
+  87:main.c        **** 
+  88:main.c        ****     for(;;)
+  89:main.c        ****     {
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 6
+
+
+  90:main.c        ****         ADC_SAR_1_StartConvert();
+ 197              		.loc 1 90 0
+ 198 002e FFF7FEFF 		bl	ADC_SAR_1_StartConvert
+ 199              	.LVL24:
+  91:main.c        ****         ADC_SAR_2_StartConvert(); //note: max amount of SAR ADCs is 2 on PSOC5 LP
+ 200              		.loc 1 91 0
+ 201 0032 FFF7FEFF 		bl	ADC_SAR_2_StartConvert
+ 202              	.LVL25:
+  92:main.c        ****         ADC_DelSig_1_StartConvert();
+ 203              		.loc 1 92 0
+ 204 0036 FFF7FEFF 		bl	ADC_DelSig_1_StartConvert
+ 205              	.LVL26:
+  93:main.c        ****         
+  94:main.c        ****         
+  95:main.c        ****         ADC_SAR_1_IsEndConversion(ADC_SAR_1_WAIT_FOR_RESULT); //wait for ADC output
+ 206              		.loc 1 95 0
+ 207 003a 0020     		movs	r0, #0
+ 208 003c FFF7FEFF 		bl	ADC_SAR_1_IsEndConversion
+ 209              	.LVL27:
+  96:main.c        ****         ADC_SAR_2_IsEndConversion(ADC_SAR_2_WAIT_FOR_RESULT);
+ 210              		.loc 1 96 0
+ 211 0040 0020     		movs	r0, #0
+ 212 0042 FFF7FEFF 		bl	ADC_SAR_2_IsEndConversion
+ 213              	.LVL28:
+  97:main.c        ****         ADC_DelSig_1_IsEndConversion(ADC_DelSig_1_WAIT_FOR_RESULT);
+ 214              		.loc 1 97 0
+ 215 0046 0020     		movs	r0, #0
+ 216 0048 FFF7FEFF 		bl	ADC_DelSig_1_IsEndConversion
+ 217              	.LVL29:
+  98:main.c        ****         
+  99:main.c        ****                 
+ 100:main.c        ****         if(0u == CapSense_CSD_IsBusy())
+ 218              		.loc 1 100 0
+ 219 004c FFF7FEFF 		bl	CapSense_CSD_IsBusy
+ 220              	.LVL30:
+ 221 0050 18B9     		cbnz	r0, .L10
+ 101:main.c        ****         {
+ 102:main.c        ****             CapSense_CSD_UpdateEnabledBaselines();
+ 222              		.loc 1 102 0
+ 223 0052 FFF7FEFF 		bl	CapSense_CSD_UpdateEnabledBaselines
+ 224              	.LVL31:
+ 103:main.c        ****             CapSense_CSD_ScanEnabledWidgets();
+ 225              		.loc 1 103 0
+ 226 0056 FFF7FEFF 		bl	CapSense_CSD_ScanEnabledWidgets
+ 227              	.LVL32:
+ 228              	.L10:
+ 104:main.c        ****         }
+ 105:main.c        ****         
+ 106:main.c        ****         val3 = CapSense_DisplayState();
+ 229              		.loc 1 106 0
+ 230 005a FFF7FEFF 		bl	CapSense_DisplayState
+ 231              	.LVL33:
+ 232 005e 8146     		mov	r9, r0
+ 233              	.LVL34:
+ 107:main.c        ****         
+ 108:main.c        ****         
+ 109:main.c        ****         val1 = (uint8_t) ADC_SAR_1_GetResult8(); //casting to uint8, as the input is int8 (bug)
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 7
+
+
+ 234              		.loc 1 109 0
+ 235 0060 FFF7FEFF 		bl	ADC_SAR_1_GetResult8
+ 236              	.LVL35:
+ 237 0064 5FFA80F8 		uxtb	r8, r0
+ 238              	.LVL36:
+ 110:main.c        ****         val2 = (uint8_t) ADC_SAR_2_GetResult8();
+ 239              		.loc 1 110 0
+ 240 0068 FFF7FEFF 		bl	ADC_SAR_2_GetResult8
+ 241              	.LVL37:
+ 242 006c C7B2     		uxtb	r7, r0
+ 243              	.LVL38:
+ 111:main.c        ****         targetPos = ADC_DelSig_1_GetResult32(); 
+ 244              		.loc 1 111 0
+ 245 006e FFF7FEFF 		bl	ADC_DelSig_1_GetResult32
+ 246              	.LVL39:
+ 247 0072 0446     		mov	r4, r0
+ 248              	.LVL40:
+ 112:main.c        ****         
+ 113:main.c        ****         mapped_val1 = range_map(val1, 0, 255, 850, 4500);//mapping 0-255 range of pot to 850-4500 r
+ 249              		.loc 1 113 0
+ 250 0074 41F29416 		movw	r6, #4500
+ 251 0078 0096     		str	r6, [sp]
+ 252 007a 40F25233 		movw	r3, #850
+ 253 007e FF22     		movs	r2, #255
+ 254 0080 0021     		movs	r1, #0
+ 255 0082 4046     		mov	r0, r8
+ 256              	.LVL41:
+ 257 0084 FFF7FEFF 		bl	range_map
+ 258              	.LVL42:
+ 259 0088 8046     		mov	r8, r0
+ 260              	.LVL43:
+ 114:main.c        ****         mapped_val2 = range_map(val2, 0, 255, 850, 4500);
+ 261              		.loc 1 114 0
+ 262 008a 0096     		str	r6, [sp]
+ 263 008c 40F25233 		movw	r3, #850
+ 264 0090 FF22     		movs	r2, #255
+ 265 0092 0021     		movs	r1, #0
+ 266 0094 3846     		mov	r0, r7
+ 267              	.LVL44:
+ 268 0096 FFF7FEFF 		bl	range_map
+ 269              	.LVL45:
+ 270 009a 0746     		mov	r7, r0
+ 271              	.LVL46:
+ 115:main.c        ****         mapped_val3 = range_map(val3, 10, 85, 850, 4400);
+ 272              		.loc 1 115 0
+ 273 009c 41F23013 		movw	r3, #4400
+ 274 00a0 0093     		str	r3, [sp]
+ 275 00a2 40F25233 		movw	r3, #850
+ 276 00a6 5522     		movs	r2, #85
+ 277 00a8 0A21     		movs	r1, #10
+ 278 00aa 4846     		mov	r0, r9
+ 279              	.LVL47:
+ 280 00ac FFF7FEFF 		bl	range_map
+ 281              	.LVL48:
+ 282 00b0 8146     		mov	r9, r0
+ 283              	.LVL49:
+ 116:main.c        ****         
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 8
+
+
+ 117:main.c        ****         PWM_1_WriteCompare(mapped_val1); //writing to pwm (servo)
+ 284              		.loc 1 117 0
+ 285 00b2 1FFA88F0 		uxth	r0, r8
+ 286              	.LVL50:
+ 287 00b6 FFF7FEFF 		bl	PWM_1_WriteCompare
+ 288              	.LVL51:
+ 118:main.c        ****         PWM_2_WriteCompare(mapped_val2);
+ 289              		.loc 1 118 0
+ 290 00ba B8B2     		uxth	r0, r7
+ 291 00bc FFF7FEFF 		bl	PWM_2_WriteCompare
+ 292              	.LVL52:
+ 119:main.c        ****         PWM_3_WriteCompare(mapped_val3);
+ 293              		.loc 1 119 0
+ 294 00c0 1FFA89F0 		uxth	r0, r9
+ 295 00c4 FFF7FEFF 		bl	PWM_3_WriteCompare
+ 296              	.LVL53:
+ 120:main.c        ****         
+ 121:main.c        ****         
+ 122:main.c        ****         if(stepPos < targetPos - 4) //clockwise motion, full wave stepping
+ 297              		.loc 1 122 0
+ 298 00c8 231F     		subs	r3, r4, #4
+ 299 00ca 9D42     		cmp	r5, r3
+ 300 00cc 39DA     		bge	.L11
+ 123:main.c        ****         {
+ 124:main.c        ****             stepper(1,0,0,0,STEP_DELAY);
+ 301              		.loc 1 124 0
+ 302 00ce 0226     		movs	r6, #2
+ 303 00d0 0096     		str	r6, [sp]
+ 304 00d2 0023     		movs	r3, #0
+ 305 00d4 1A46     		mov	r2, r3
+ 306 00d6 1946     		mov	r1, r3
+ 307 00d8 0120     		movs	r0, #1
+ 308 00da FFF7FEFF 		bl	stepper
+ 309              	.LVL54:
+ 125:main.c        ****             stepper(1,1,0,0,STEP_DELAY);
+ 310              		.loc 1 125 0
+ 311 00de 0096     		str	r6, [sp]
+ 312 00e0 0023     		movs	r3, #0
+ 313 00e2 1A46     		mov	r2, r3
+ 314 00e4 0121     		movs	r1, #1
+ 315 00e6 0846     		mov	r0, r1
+ 316 00e8 FFF7FEFF 		bl	stepper
+ 317              	.LVL55:
+ 126:main.c        ****             stepper(0,1,0,0,STEP_DELAY);
+ 318              		.loc 1 126 0
+ 319 00ec 0096     		str	r6, [sp]
+ 320 00ee 0023     		movs	r3, #0
+ 321 00f0 1A46     		mov	r2, r3
+ 322 00f2 0121     		movs	r1, #1
+ 323 00f4 1846     		mov	r0, r3
+ 324 00f6 FFF7FEFF 		bl	stepper
+ 325              	.LVL56:
+ 127:main.c        ****             stepper(0,1,1,0,STEP_DELAY);
+ 326              		.loc 1 127 0
+ 327 00fa 0096     		str	r6, [sp]
+ 328 00fc 0023     		movs	r3, #0
+ 329 00fe 0122     		movs	r2, #1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 9
+
+
+ 330 0100 1146     		mov	r1, r2
+ 331 0102 1846     		mov	r0, r3
+ 332 0104 FFF7FEFF 		bl	stepper
+ 333              	.LVL57:
+ 128:main.c        ****             stepper(0,0,1,0,STEP_DELAY);
+ 334              		.loc 1 128 0
+ 335 0108 0096     		str	r6, [sp]
+ 336 010a 0023     		movs	r3, #0
+ 337 010c 0122     		movs	r2, #1
+ 338 010e 1946     		mov	r1, r3
+ 339 0110 1846     		mov	r0, r3
+ 340 0112 FFF7FEFF 		bl	stepper
+ 341              	.LVL58:
+ 129:main.c        ****             stepper(0,0,1,1,STEP_DELAY);
+ 342              		.loc 1 129 0
+ 343 0116 0096     		str	r6, [sp]
+ 344 0118 0123     		movs	r3, #1
+ 345 011a 1A46     		mov	r2, r3
+ 346 011c 0021     		movs	r1, #0
+ 347 011e 0846     		mov	r0, r1
+ 348 0120 FFF7FEFF 		bl	stepper
+ 349              	.LVL59:
+ 130:main.c        ****             stepper(0,0,0,1,STEP_DELAY);
+ 350              		.loc 1 130 0
+ 351 0124 0096     		str	r6, [sp]
+ 352 0126 0123     		movs	r3, #1
+ 353 0128 0022     		movs	r2, #0
+ 354 012a 1146     		mov	r1, r2
+ 355 012c 1046     		mov	r0, r2
+ 356 012e FFF7FEFF 		bl	stepper
+ 357              	.LVL60:
+ 131:main.c        ****             stepper(1,0,0,1,STEP_DELAY);
+ 358              		.loc 1 131 0
+ 359 0132 0096     		str	r6, [sp]
+ 360 0134 0123     		movs	r3, #1
+ 361 0136 0022     		movs	r2, #0
+ 362 0138 1146     		mov	r1, r2
+ 363 013a 1846     		mov	r0, r3
+ 364 013c FFF7FEFF 		bl	stepper
+ 365              	.LVL61:
+ 132:main.c        ****             
+ 133:main.c        ****             stepPos++;          
+ 366              		.loc 1 133 0
+ 367 0140 0135     		adds	r5, r5, #1
+ 368              	.LVL62:
+ 369              	.L11:
+ 134:main.c        ****         }
+ 135:main.c        ****         if(stepPos > targetPos + 4 ) //counter-clockwise motion, full wave stepping 
+ 370              		.loc 1 135 0
+ 371 0142 231D     		adds	r3, r4, #4
+ 372 0144 9D42     		cmp	r5, r3
+ 373 0146 39DD     		ble	.L12
+ 136:main.c        ****         {
+ 137:main.c        ****             stepper(0,0,0,1,STEP_DELAY);
+ 374              		.loc 1 137 0
+ 375 0148 0226     		movs	r6, #2
+ 376 014a 0096     		str	r6, [sp]
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 10
+
+
+ 377 014c 0123     		movs	r3, #1
+ 378 014e 0022     		movs	r2, #0
+ 379 0150 1146     		mov	r1, r2
+ 380 0152 1046     		mov	r0, r2
+ 381 0154 FFF7FEFF 		bl	stepper
+ 382              	.LVL63:
+ 138:main.c        ****             stepper(0,0,1,1,STEP_DELAY);
+ 383              		.loc 1 138 0
+ 384 0158 0096     		str	r6, [sp]
+ 385 015a 0123     		movs	r3, #1
+ 386 015c 1A46     		mov	r2, r3
+ 387 015e 0021     		movs	r1, #0
+ 388 0160 0846     		mov	r0, r1
+ 389 0162 FFF7FEFF 		bl	stepper
+ 390              	.LVL64:
+ 139:main.c        ****             stepper(0,0,1,0,STEP_DELAY);
+ 391              		.loc 1 139 0
+ 392 0166 0096     		str	r6, [sp]
+ 393 0168 0023     		movs	r3, #0
+ 394 016a 0122     		movs	r2, #1
+ 395 016c 1946     		mov	r1, r3
+ 396 016e 1846     		mov	r0, r3
+ 397 0170 FFF7FEFF 		bl	stepper
+ 398              	.LVL65:
+ 140:main.c        ****             stepper(0,1,1,0,STEP_DELAY);
+ 399              		.loc 1 140 0
+ 400 0174 0096     		str	r6, [sp]
+ 401 0176 0023     		movs	r3, #0
+ 402 0178 0122     		movs	r2, #1
+ 403 017a 1146     		mov	r1, r2
+ 404 017c 1846     		mov	r0, r3
+ 405 017e FFF7FEFF 		bl	stepper
+ 406              	.LVL66:
+ 141:main.c        ****             stepper(0,1,0,0,STEP_DELAY);
+ 407              		.loc 1 141 0
+ 408 0182 0096     		str	r6, [sp]
+ 409 0184 0023     		movs	r3, #0
+ 410 0186 1A46     		mov	r2, r3
+ 411 0188 0121     		movs	r1, #1
+ 412 018a 1846     		mov	r0, r3
+ 413 018c FFF7FEFF 		bl	stepper
+ 414              	.LVL67:
+ 142:main.c        ****             stepper(1,1,0,0,STEP_DELAY);
+ 415              		.loc 1 142 0
+ 416 0190 0096     		str	r6, [sp]
+ 417 0192 0023     		movs	r3, #0
+ 418 0194 1A46     		mov	r2, r3
+ 419 0196 0121     		movs	r1, #1
+ 420 0198 0846     		mov	r0, r1
+ 421 019a FFF7FEFF 		bl	stepper
+ 422              	.LVL68:
+ 143:main.c        ****             stepper(1,0,0,0,STEP_DELAY);
+ 423              		.loc 1 143 0
+ 424 019e 0096     		str	r6, [sp]
+ 425 01a0 0023     		movs	r3, #0
+ 426 01a2 1A46     		mov	r2, r3
+ 427 01a4 1946     		mov	r1, r3
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 11
+
+
+ 428 01a6 0120     		movs	r0, #1
+ 429 01a8 FFF7FEFF 		bl	stepper
+ 430              	.LVL69:
+ 144:main.c        ****             stepper(1,0,0,1,STEP_DELAY);
+ 431              		.loc 1 144 0
+ 432 01ac 0096     		str	r6, [sp]
+ 433 01ae 0123     		movs	r3, #1
+ 434 01b0 0022     		movs	r2, #0
+ 435 01b2 1146     		mov	r1, r2
+ 436 01b4 1846     		mov	r0, r3
+ 437 01b6 FFF7FEFF 		bl	stepper
+ 438              	.LVL70:
+ 145:main.c        ****             
+ 146:main.c        ****             stepPos--;
+ 439              		.loc 1 146 0
+ 440 01ba 013D     		subs	r5, r5, #1
+ 441              	.LVL71:
+ 442              	.L12:
+ 147:main.c        ****         }
+ 148:main.c        ****         
+ 149:main.c        ****                   
+ 150:main.c        ****             LCD_Char_1_ClearDisplay(); //clears display
+ 443              		.loc 1 150 0
+ 444 01bc 0120     		movs	r0, #1
+ 445 01be FFF7FEFF 		bl	LCD_Char_1_WriteControl
+ 446              	.LVL72:
+ 151:main.c        ****             LCD_Char_1_WriteControl(LCD_Char_1_CURSOR_HOME); //sets cursor to top left corner
+ 447              		.loc 1 151 0
+ 448 01c2 0220     		movs	r0, #2
+ 449 01c4 FFF7FEFF 		bl	LCD_Char_1_WriteControl
+ 450              	.LVL73:
+ 152:main.c        ****             sprintf(lcdOutput,"targ=%3d", (int)targetPos);
+ 451              		.loc 1 152 0
+ 452 01c8 2246     		mov	r2, r4
+ 453 01ca 1249     		ldr	r1, .L15
+ 454 01cc 02A8     		add	r0, sp, #8
+ 455 01ce FFF7FEFF 		bl	sprintf
+ 456              	.LVL74:
+ 153:main.c        ****             LCD_Char_1_Position(0,0); 
+ 457              		.loc 1 153 0
+ 458 01d2 0021     		movs	r1, #0
+ 459 01d4 0846     		mov	r0, r1
+ 460 01d6 FFF7FEFF 		bl	LCD_Char_1_Position
+ 461              	.LVL75:
+ 154:main.c        ****             LCD_Char_1_PrintString(lcdOutput); //prints PWM value for servo 1
+ 462              		.loc 1 154 0
+ 463 01da 02A8     		add	r0, sp, #8
+ 464 01dc FFF7FEFF 		bl	LCD_Char_1_PrintString
+ 465              	.LVL76:
+ 155:main.c        ****             
+ 156:main.c        ****             sprintf(lcdOutput,"Val2=%d", (int)mapped_val2);
+ 466              		.loc 1 156 0
+ 467 01e0 3A46     		mov	r2, r7
+ 468 01e2 0D49     		ldr	r1, .L15+4
+ 469 01e4 02A8     		add	r0, sp, #8
+ 470 01e6 FFF7FEFF 		bl	sprintf
+ 471              	.LVL77:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 12
+
+
+ 157:main.c        ****             LCD_Char_1_Position(1,0); 
+ 472              		.loc 1 157 0
+ 473 01ea 0021     		movs	r1, #0
+ 474 01ec 0120     		movs	r0, #1
+ 475 01ee FFF7FEFF 		bl	LCD_Char_1_Position
+ 476              	.LVL78:
+ 158:main.c        ****             LCD_Char_1_PrintString(lcdOutput); //prints PWM value for servo 1
+ 477              		.loc 1 158 0
+ 478 01f2 02A8     		add	r0, sp, #8
+ 479 01f4 FFF7FEFF 		bl	LCD_Char_1_PrintString
+ 480              	.LVL79:
+ 159:main.c        ****             
+ 160:main.c        ****             sprintf(lcdOutput,"Val3=%d", (int)mapped_val3);
+ 481              		.loc 1 160 0
+ 482 01f8 4A46     		mov	r2, r9
+ 483 01fa 0849     		ldr	r1, .L15+8
+ 484 01fc 02A8     		add	r0, sp, #8
+ 485 01fe FFF7FEFF 		bl	sprintf
+ 486              	.LVL80:
+ 161:main.c        ****             LCD_Char_1_Position(8,0); 
+ 487              		.loc 1 161 0
+ 488 0202 0021     		movs	r1, #0
+ 489 0204 0820     		movs	r0, #8
+ 490 0206 FFF7FEFF 		bl	LCD_Char_1_Position
+ 491              	.LVL81:
+ 162:main.c        ****             LCD_Char_1_PrintString(lcdOutput); //prints PWM value for servo 1
+ 492              		.loc 1 162 0
+ 493 020a 02A8     		add	r0, sp, #8
+ 494 020c FFF7FEFF 		bl	LCD_Char_1_PrintString
+ 495              	.LVL82:
+ 163:main.c        ****             
+ 164:main.c        ****             
+ 165:main.c        ****         /*
+ 166:main.c        ****         due to SAR ADC # limits, possibly add switching buttons to switch between controlling
+ 167:main.c        ****         different servos with a single potentiometer, and use sliding CapSense for claw control
+ 168:main.c        ****         */
+ 169:main.c        ****             
+ 170:main.c        **** 
+ 171:main.c        ****         
+ 172:main.c        ****         
+ 173:main.c        ****     }
+ 496              		.loc 1 173 0
+ 497 0210 0DE7     		b	.L13
+ 498              	.L16:
+ 499 0212 00BF     		.align	2
+ 500              	.L15:
+ 501 0214 00000000 		.word	.LC0
+ 502 0218 0C000000 		.word	.LC1
+ 503 021c 14000000 		.word	.LC2
+ 504              		.cfi_endproc
+ 505              	.LFE67:
+ 506              		.size	main, .-main
+ 507              		.comm	oldPos,2,2
+ 508              		.comm	curPos,2,2
+ 509              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 510              		.align	2
+ 511              	.LC0:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 13
+
+
+ 512 0000 74617267 		.ascii	"targ=%3d\000"
+ 512      3D253364 
+ 512      00
+ 513 0009 000000   		.space	3
+ 514              	.LC1:
+ 515 000c 56616C32 		.ascii	"Val2=%d\000"
+ 515      3D256400 
+ 516              	.LC2:
+ 517 0014 56616C33 		.ascii	"Val3=%d\000"
+ 517      3D256400 
+ 518              		.text
+ 519              	.Letext0:
+ 520              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 521              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 522              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 523              		.file 5 "Generated_Source\\PSoC5/core_cm3.h"
+ 524              		.file 6 "Generated_Source\\PSoC5/CapSense_CSD_CSHL.h"
+ 525              		.file 7 "Generated_Source\\PSoC5/A.h"
+ 526              		.file 8 "Generated_Source\\PSoC5/B.h"
+ 527              		.file 9 "Generated_Source\\PSoC5/C.h"
+ 528              		.file 10 "Generated_Source\\PSoC5/D.h"
+ 529              		.file 11 "Generated_Source\\PSoC5/CyLib.h"
+ 530              		.file 12 "Generated_Source\\PSoC5/LCD_Char_1.h"
+ 531              		.file 13 "Generated_Source\\PSoC5/PWM_1.h"
+ 532              		.file 14 "Generated_Source\\PSoC5/ADC_SAR_1.h"
+ 533              		.file 15 "Generated_Source\\PSoC5/PWM_2.h"
+ 534              		.file 16 "Generated_Source\\PSoC5/ADC_SAR_2.h"
+ 535              		.file 17 "Generated_Source\\PSoC5/ADC_DelSig_1.h"
+ 536              		.file 18 "Generated_Source\\PSoC5/PWM_3.h"
+ 537              		.file 19 "Generated_Source\\PSoC5/CapSense_CSD.h"
+ 538              		.file 20 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4
+ 539              		.section	.debug_info,"",%progbits
+ 540              	.Ldebug_info0:
+ 541 0000 B3090000 		.4byte	0x9b3
+ 542 0004 0400     		.2byte	0x4
+ 543 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 544 000a 04       		.byte	0x4
+ 545 000b 01       		.uleb128 0x1
+ 546 000c 48040000 		.4byte	.LASF69
+ 547 0010 0C       		.byte	0xc
+ 548 0011 8E030000 		.4byte	.LASF70
+ 549 0015 00000000 		.4byte	.LASF71
+ 550 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 551 001d 00000000 		.4byte	0
+ 552 0021 00000000 		.4byte	.Ldebug_line0
+ 553 0025 02       		.uleb128 0x2
+ 554 0026 01       		.byte	0x1
+ 555 0027 06       		.byte	0x6
+ 556 0028 45010000 		.4byte	.LASF0
+ 557 002c 03       		.uleb128 0x3
+ 558 002d F2040000 		.4byte	.LASF4
+ 559 0031 02       		.byte	0x2
+ 560 0032 1D       		.byte	0x1d
+ 561 0033 37000000 		.4byte	0x37
+ 562 0037 02       		.uleb128 0x2
+ 563 0038 01       		.byte	0x1
+ 564 0039 08       		.byte	0x8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 14
+
+
+ 565 003a D1010000 		.4byte	.LASF1
+ 566 003e 02       		.uleb128 0x2
+ 567 003f 02       		.byte	0x2
+ 568 0040 05       		.byte	0x5
+ 569 0041 7C000000 		.4byte	.LASF2
+ 570 0045 02       		.uleb128 0x2
+ 571 0046 02       		.byte	0x2
+ 572 0047 07       		.byte	0x7
+ 573 0048 7B030000 		.4byte	.LASF3
+ 574 004c 03       		.uleb128 0x3
+ 575 004d FE030000 		.4byte	.LASF5
+ 576 0051 02       		.byte	0x2
+ 577 0052 3F       		.byte	0x3f
+ 578 0053 57000000 		.4byte	0x57
+ 579 0057 02       		.uleb128 0x2
+ 580 0058 04       		.byte	0x4
+ 581 0059 05       		.byte	0x5
+ 582 005a 78010000 		.4byte	.LASF6
+ 583 005e 02       		.uleb128 0x2
+ 584 005f 04       		.byte	0x4
+ 585 0060 07       		.byte	0x7
+ 586 0061 AB030000 		.4byte	.LASF7
+ 587 0065 02       		.uleb128 0x2
+ 588 0066 08       		.byte	0x8
+ 589 0067 05       		.byte	0x5
+ 590 0068 6A010000 		.4byte	.LASF8
+ 591 006c 02       		.uleb128 0x2
+ 592 006d 08       		.byte	0x8
+ 593 006e 07       		.byte	0x7
+ 594 006f 94020000 		.4byte	.LASF9
+ 595 0073 04       		.uleb128 0x4
+ 596 0074 04       		.byte	0x4
+ 597 0075 05       		.byte	0x5
+ 598 0076 696E7400 		.ascii	"int\000"
+ 599 007a 02       		.uleb128 0x2
+ 600 007b 04       		.byte	0x4
+ 601 007c 07       		.byte	0x7
+ 602 007d B2020000 		.4byte	.LASF10
+ 603 0081 03       		.uleb128 0x3
+ 604 0082 FA000000 		.4byte	.LASF11
+ 605 0086 03       		.byte	0x3
+ 606 0087 18       		.byte	0x18
+ 607 0088 2C000000 		.4byte	0x2c
+ 608 008c 03       		.uleb128 0x3
+ 609 008d 52030000 		.4byte	.LASF12
+ 610 0091 03       		.byte	0x3
+ 611 0092 2C       		.byte	0x2c
+ 612 0093 4C000000 		.4byte	0x4c
+ 613 0097 05       		.uleb128 0x5
+ 614 0098 F3000000 		.4byte	.LASF13
+ 615 009c 04       		.byte	0x4
+ 616 009d E501     		.2byte	0x1e5
+ 617 009f 45000000 		.4byte	0x45
+ 618 00a3 02       		.uleb128 0x2
+ 619 00a4 04       		.byte	0x4
+ 620 00a5 04       		.byte	0x4
+ 621 00a6 64010000 		.4byte	.LASF14
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 15
+
+
+ 622 00aa 02       		.uleb128 0x2
+ 623 00ab 08       		.byte	0x8
+ 624 00ac 04       		.byte	0x4
+ 625 00ad 10040000 		.4byte	.LASF15
+ 626 00b1 02       		.uleb128 0x2
+ 627 00b2 01       		.byte	0x1
+ 628 00b3 08       		.byte	0x8
+ 629 00b4 1F030000 		.4byte	.LASF16
+ 630 00b8 02       		.uleb128 0x2
+ 631 00b9 08       		.byte	0x8
+ 632 00ba 04       		.byte	0x4
+ 633 00bb 05020000 		.4byte	.LASF17
+ 634 00bf 02       		.uleb128 0x2
+ 635 00c0 04       		.byte	0x4
+ 636 00c1 07       		.byte	0x7
+ 637 00c2 9B000000 		.4byte	.LASF18
+ 638 00c6 06       		.uleb128 0x6
+ 639 00c7 95030000 		.4byte	.LASF20
+ 640 00cb 01       		.byte	0x1
+ 641 00cc 16       		.byte	0x16
+ 642 00cd 97000000 		.4byte	0x97
+ 643 00d1 00000000 		.4byte	.LFB64
+ 644 00d5 14000000 		.4byte	.LFE64-.LFB64
+ 645 00d9 01       		.uleb128 0x1
+ 646 00da 9C       		.byte	0x9c
+ 647 00db EF000000 		.4byte	0xef
+ 648 00df 07       		.uleb128 0x7
+ 649 00e0 08000000 		.4byte	.LVL0
+ 650 00e4 40080000 		.4byte	0x840
+ 651 00e8 08       		.uleb128 0x8
+ 652 00e9 01       		.uleb128 0x1
+ 653 00ea 50       		.byte	0x50
+ 654 00eb 01       		.uleb128 0x1
+ 655 00ec 30       		.byte	0x30
+ 656 00ed 00       		.byte	0
+ 657 00ee 00       		.byte	0
+ 658 00ef 09       		.uleb128 0x9
+ 659 00f0 74020000 		.4byte	.LASF72
+ 660 00f4 01       		.byte	0x1
+ 661 00f5 26       		.byte	0x26
+ 662 00f6 00000000 		.4byte	.LFB65
+ 663 00fa 28000000 		.4byte	.LFE65-.LFB65
+ 664 00fe 01       		.uleb128 0x1
+ 665 00ff 9C       		.byte	0x9c
+ 666 0100 A9010000 		.4byte	0x1a9
+ 667 0104 0A       		.uleb128 0xa
+ 668 0105 6100     		.ascii	"a\000"
+ 669 0107 01       		.byte	0x1
+ 670 0108 26       		.byte	0x26
+ 671 0109 73000000 		.4byte	0x73
+ 672 010d 00000000 		.4byte	.LLST0
+ 673 0111 0A       		.uleb128 0xa
+ 674 0112 6200     		.ascii	"b\000"
+ 675 0114 01       		.byte	0x1
+ 676 0115 26       		.byte	0x26
+ 677 0116 73000000 		.4byte	0x73
+ 678 011a 21000000 		.4byte	.LLST1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 16
+
+
+ 679 011e 0A       		.uleb128 0xa
+ 680 011f 6300     		.ascii	"c\000"
+ 681 0121 01       		.byte	0x1
+ 682 0122 26       		.byte	0x26
+ 683 0123 73000000 		.4byte	0x73
+ 684 0127 3F000000 		.4byte	.LLST2
+ 685 012b 0A       		.uleb128 0xa
+ 686 012c 6400     		.ascii	"d\000"
+ 687 012e 01       		.byte	0x1
+ 688 012f 26       		.byte	0x26
+ 689 0130 73000000 		.4byte	0x73
+ 690 0134 5D000000 		.4byte	.LLST3
+ 691 0138 0B       		.uleb128 0xb
+ 692 0139 81010000 		.4byte	.LASF19
+ 693 013d 01       		.byte	0x1
+ 694 013e 26       		.byte	0x26
+ 695 013f 73000000 		.4byte	0x73
+ 696 0143 02       		.uleb128 0x2
+ 697 0144 91       		.byte	0x91
+ 698 0145 00       		.sleb128 0
+ 699 0146 0C       		.uleb128 0xc
+ 700 0147 0E000000 		.4byte	.LVL3
+ 701 014b 4B080000 		.4byte	0x84b
+ 702 014f 5B010000 		.4byte	0x15b
+ 703 0153 08       		.uleb128 0x8
+ 704 0154 01       		.uleb128 0x1
+ 705 0155 50       		.byte	0x50
+ 706 0156 03       		.uleb128 0x3
+ 707 0157 F3       		.byte	0xf3
+ 708 0158 01       		.uleb128 0x1
+ 709 0159 50       		.byte	0x50
+ 710 015a 00       		.byte	0
+ 711 015b 0C       		.uleb128 0xc
+ 712 015c 14000000 		.4byte	.LVL4
+ 713 0160 56080000 		.4byte	0x856
+ 714 0164 6F010000 		.4byte	0x16f
+ 715 0168 08       		.uleb128 0x8
+ 716 0169 01       		.uleb128 0x1
+ 717 016a 50       		.byte	0x50
+ 718 016b 02       		.uleb128 0x2
+ 719 016c 76       		.byte	0x76
+ 720 016d 00       		.sleb128 0
+ 721 016e 00       		.byte	0
+ 722 016f 0C       		.uleb128 0xc
+ 723 0170 1A000000 		.4byte	.LVL5
+ 724 0174 61080000 		.4byte	0x861
+ 725 0178 83010000 		.4byte	0x183
+ 726 017c 08       		.uleb128 0x8
+ 727 017d 01       		.uleb128 0x1
+ 728 017e 50       		.byte	0x50
+ 729 017f 02       		.uleb128 0x2
+ 730 0180 75       		.byte	0x75
+ 731 0181 00       		.sleb128 0
+ 732 0182 00       		.byte	0
+ 733 0183 0C       		.uleb128 0xc
+ 734 0184 20000000 		.4byte	.LVL6
+ 735 0188 6C080000 		.4byte	0x86c
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 17
+
+
+ 736 018c 97010000 		.4byte	0x197
+ 737 0190 08       		.uleb128 0x8
+ 738 0191 01       		.uleb128 0x1
+ 739 0192 50       		.byte	0x50
+ 740 0193 02       		.uleb128 0x2
+ 741 0194 74       		.byte	0x74
+ 742 0195 00       		.sleb128 0
+ 743 0196 00       		.byte	0
+ 744 0197 07       		.uleb128 0x7
+ 745 0198 26000000 		.4byte	.LVL7
+ 746 019c 77080000 		.4byte	0x877
+ 747 01a0 08       		.uleb128 0x8
+ 748 01a1 01       		.uleb128 0x1
+ 749 01a2 50       		.byte	0x50
+ 750 01a3 03       		.uleb128 0x3
+ 751 01a4 91       		.byte	0x91
+ 752 01a5 00       		.sleb128 0
+ 753 01a6 06       		.byte	0x6
+ 754 01a7 00       		.byte	0
+ 755 01a8 00       		.byte	0
+ 756 01a9 06       		.uleb128 0x6
+ 757 01aa 3B010000 		.4byte	.LASF21
+ 758 01ae 01       		.byte	0x1
+ 759 01af 30       		.byte	0x30
+ 760 01b0 73000000 		.4byte	0x73
+ 761 01b4 00000000 		.4byte	.LFB66
+ 762 01b8 18000000 		.4byte	.LFE66-.LFB66
+ 763 01bc 01       		.uleb128 0x1
+ 764 01bd 9C       		.byte	0x9c
+ 765 01be 0F020000 		.4byte	0x20f
+ 766 01c2 0A       		.uleb128 0xa
+ 767 01c3 7800     		.ascii	"x\000"
+ 768 01c5 01       		.byte	0x1
+ 769 01c6 30       		.byte	0x30
+ 770 01c7 73000000 		.4byte	0x73
+ 771 01cb 7B000000 		.4byte	.LLST4
+ 772 01cf 0D       		.uleb128 0xd
+ 773 01d0 6100     		.ascii	"a\000"
+ 774 01d2 01       		.byte	0x1
+ 775 01d3 30       		.byte	0x30
+ 776 01d4 73000000 		.4byte	0x73
+ 777 01d8 01       		.uleb128 0x1
+ 778 01d9 51       		.byte	0x51
+ 779 01da 0A       		.uleb128 0xa
+ 780 01db 6200     		.ascii	"b\000"
+ 781 01dd 01       		.byte	0x1
+ 782 01de 30       		.byte	0x30
+ 783 01df 73000000 		.4byte	0x73
+ 784 01e3 9C000000 		.4byte	.LLST5
+ 785 01e7 0D       		.uleb128 0xd
+ 786 01e8 6300     		.ascii	"c\000"
+ 787 01ea 01       		.byte	0x1
+ 788 01eb 30       		.byte	0x30
+ 789 01ec 73000000 		.4byte	0x73
+ 790 01f0 01       		.uleb128 0x1
+ 791 01f1 53       		.byte	0x53
+ 792 01f2 0A       		.uleb128 0xa
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 18
+
+
+ 793 01f3 6400     		.ascii	"d\000"
+ 794 01f5 01       		.byte	0x1
+ 795 01f6 30       		.byte	0x30
+ 796 01f7 73000000 		.4byte	0x73
+ 797 01fb BD000000 		.4byte	.LLST6
+ 798 01ff 0E       		.uleb128 0xe
+ 799 0200 86000000 		.4byte	.LASF22
+ 800 0204 01       		.byte	0x1
+ 801 0205 32       		.byte	0x32
+ 802 0206 73000000 		.4byte	0x73
+ 803 020a DD000000 		.4byte	.LLST7
+ 804 020e 00       		.byte	0
+ 805 020f 0F       		.uleb128 0xf
+ 806 0210 B0000000 		.4byte	.LASF73
+ 807 0214 01       		.byte	0x1
+ 808 0215 39       		.byte	0x39
+ 809 0216 73000000 		.4byte	0x73
+ 810 021a 00000000 		.4byte	.LFB67
+ 811 021e 20020000 		.4byte	.LFE67-.LFB67
+ 812 0222 01       		.uleb128 0x1
+ 813 0223 9C       		.byte	0x9c
+ 814 0224 FD070000 		.4byte	0x7fd
+ 815 0228 10       		.uleb128 0x10
+ 816 0229 91000000 		.4byte	.LASF23
+ 817 022d 01       		.byte	0x1
+ 818 022e 3E       		.byte	0x3e
+ 819 022f FD070000 		.4byte	0x7fd
+ 820 0233 03       		.uleb128 0x3
+ 821 0234 91       		.byte	0x91
+ 822 0235 E07D     		.sleb128 -288
+ 823 0237 0E       		.uleb128 0xe
+ 824 0238 BF020000 		.4byte	.LASF24
+ 825 023c 01       		.byte	0x1
+ 826 023d 4C       		.byte	0x4c
+ 827 023e 73000000 		.4byte	0x73
+ 828 0242 00010000 		.4byte	.LLST8
+ 829 0246 0E       		.uleb128 0xe
+ 830 0247 C4020000 		.4byte	.LASF25
+ 831 024b 01       		.byte	0x1
+ 832 024c 4D       		.byte	0x4d
+ 833 024d 73000000 		.4byte	0x73
+ 834 0251 13010000 		.4byte	.LLST9
+ 835 0255 0E       		.uleb128 0xe
+ 836 0256 C9020000 		.4byte	.LASF26
+ 837 025a 01       		.byte	0x1
+ 838 025b 4E       		.byte	0x4e
+ 839 025c 73000000 		.4byte	0x73
+ 840 0260 26010000 		.4byte	.LLST10
+ 841 0264 0E       		.uleb128 0xe
+ 842 0265 08040000 		.4byte	.LASF27
+ 843 0269 01       		.byte	0x1
+ 844 026a 50       		.byte	0x50
+ 845 026b 73000000 		.4byte	0x73
+ 846 026f 44010000 		.4byte	.LLST11
+ 847 0273 0E       		.uleb128 0xe
+ 848 0274 72000000 		.4byte	.LASF28
+ 849 0278 01       		.byte	0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 19
+
+
+ 850 0279 51       		.byte	0x51
+ 851 027a 73000000 		.4byte	0x73
+ 852 027e 63010000 		.4byte	.LLST12
+ 853 0282 0E       		.uleb128 0xe
+ 854 0283 E6040000 		.4byte	.LASF29
+ 855 0287 01       		.byte	0x1
+ 856 0288 53       		.byte	0x53
+ 857 0289 73000000 		.4byte	0x73
+ 858 028d 8D010000 		.4byte	.LLST13
+ 859 0291 0E       		.uleb128 0xe
+ 860 0292 A4010000 		.4byte	.LASF30
+ 861 0296 01       		.byte	0x1
+ 862 0297 54       		.byte	0x54
+ 863 0298 73000000 		.4byte	0x73
+ 864 029c AB010000 		.4byte	.LLST14
+ 865 02a0 0E       		.uleb128 0xe
+ 866 02a1 B0010000 		.4byte	.LASF31
+ 867 02a5 01       		.byte	0x1
+ 868 02a6 55       		.byte	0x55
+ 869 02a7 73000000 		.4byte	0x73
+ 870 02ab C9010000 		.4byte	.LLST15
+ 871 02af 11       		.uleb128 0x11
+ 872 02b0 0C000000 		.4byte	.LVL14
+ 873 02b4 82080000 		.4byte	0x882
+ 874 02b8 11       		.uleb128 0x11
+ 875 02b9 10000000 		.4byte	.LVL15
+ 876 02bd 8D080000 		.4byte	0x88d
+ 877 02c1 11       		.uleb128 0x11
+ 878 02c2 14000000 		.4byte	.LVL16
+ 879 02c6 98080000 		.4byte	0x898
+ 880 02ca 11       		.uleb128 0x11
+ 881 02cb 18000000 		.4byte	.LVL17
+ 882 02cf A3080000 		.4byte	0x8a3
+ 883 02d3 11       		.uleb128 0x11
+ 884 02d4 1C000000 		.4byte	.LVL18
+ 885 02d8 AE080000 		.4byte	0x8ae
+ 886 02dc 11       		.uleb128 0x11
+ 887 02dd 20000000 		.4byte	.LVL19
+ 888 02e1 B9080000 		.4byte	0x8b9
+ 889 02e5 11       		.uleb128 0x11
+ 890 02e6 24000000 		.4byte	.LVL20
+ 891 02ea C4080000 		.4byte	0x8c4
+ 892 02ee 11       		.uleb128 0x11
+ 893 02ef 28000000 		.4byte	.LVL21
+ 894 02f3 CF080000 		.4byte	0x8cf
+ 895 02f7 11       		.uleb128 0x11
+ 896 02f8 2C000000 		.4byte	.LVL22
+ 897 02fc DA080000 		.4byte	0x8da
+ 898 0300 11       		.uleb128 0x11
+ 899 0301 32000000 		.4byte	.LVL24
+ 900 0305 E5080000 		.4byte	0x8e5
+ 901 0309 11       		.uleb128 0x11
+ 902 030a 36000000 		.4byte	.LVL25
+ 903 030e F0080000 		.4byte	0x8f0
+ 904 0312 11       		.uleb128 0x11
+ 905 0313 3A000000 		.4byte	.LVL26
+ 906 0317 FB080000 		.4byte	0x8fb
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 20
+
+
+ 907 031b 0C       		.uleb128 0xc
+ 908 031c 40000000 		.4byte	.LVL27
+ 909 0320 06090000 		.4byte	0x906
+ 910 0324 2E030000 		.4byte	0x32e
+ 911 0328 08       		.uleb128 0x8
+ 912 0329 01       		.uleb128 0x1
+ 913 032a 50       		.byte	0x50
+ 914 032b 01       		.uleb128 0x1
+ 915 032c 30       		.byte	0x30
+ 916 032d 00       		.byte	0
+ 917 032e 0C       		.uleb128 0xc
+ 918 032f 46000000 		.4byte	.LVL28
+ 919 0333 11090000 		.4byte	0x911
+ 920 0337 41030000 		.4byte	0x341
+ 921 033b 08       		.uleb128 0x8
+ 922 033c 01       		.uleb128 0x1
+ 923 033d 50       		.byte	0x50
+ 924 033e 01       		.uleb128 0x1
+ 925 033f 30       		.byte	0x30
+ 926 0340 00       		.byte	0
+ 927 0341 0C       		.uleb128 0xc
+ 928 0342 4C000000 		.4byte	.LVL29
+ 929 0346 1C090000 		.4byte	0x91c
+ 930 034a 54030000 		.4byte	0x354
+ 931 034e 08       		.uleb128 0x8
+ 932 034f 01       		.uleb128 0x1
+ 933 0350 50       		.byte	0x50
+ 934 0351 01       		.uleb128 0x1
+ 935 0352 30       		.byte	0x30
+ 936 0353 00       		.byte	0
+ 937 0354 11       		.uleb128 0x11
+ 938 0355 50000000 		.4byte	.LVL30
+ 939 0359 27090000 		.4byte	0x927
+ 940 035d 11       		.uleb128 0x11
+ 941 035e 56000000 		.4byte	.LVL31
+ 942 0362 32090000 		.4byte	0x932
+ 943 0366 11       		.uleb128 0x11
+ 944 0367 5A000000 		.4byte	.LVL32
+ 945 036b 3D090000 		.4byte	0x93d
+ 946 036f 11       		.uleb128 0x11
+ 947 0370 5E000000 		.4byte	.LVL33
+ 948 0374 C6000000 		.4byte	0xc6
+ 949 0378 11       		.uleb128 0x11
+ 950 0379 64000000 		.4byte	.LVL35
+ 951 037d 48090000 		.4byte	0x948
+ 952 0381 11       		.uleb128 0x11
+ 953 0382 6C000000 		.4byte	.LVL37
+ 954 0386 53090000 		.4byte	0x953
+ 955 038a 11       		.uleb128 0x11
+ 956 038b 72000000 		.4byte	.LVL39
+ 957 038f 5E090000 		.4byte	0x95e
+ 958 0393 0C       		.uleb128 0xc
+ 959 0394 88000000 		.4byte	.LVL42
+ 960 0398 A9010000 		.4byte	0x1a9
+ 961 039c C0030000 		.4byte	0x3c0
+ 962 03a0 08       		.uleb128 0x8
+ 963 03a1 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 21
+
+
+ 964 03a2 50       		.byte	0x50
+ 965 03a3 02       		.uleb128 0x2
+ 966 03a4 78       		.byte	0x78
+ 967 03a5 00       		.sleb128 0
+ 968 03a6 08       		.uleb128 0x8
+ 969 03a7 01       		.uleb128 0x1
+ 970 03a8 51       		.byte	0x51
+ 971 03a9 01       		.uleb128 0x1
+ 972 03aa 30       		.byte	0x30
+ 973 03ab 08       		.uleb128 0x8
+ 974 03ac 01       		.uleb128 0x1
+ 975 03ad 52       		.byte	0x52
+ 976 03ae 02       		.uleb128 0x2
+ 977 03af 08       		.byte	0x8
+ 978 03b0 FF       		.byte	0xff
+ 979 03b1 08       		.uleb128 0x8
+ 980 03b2 01       		.uleb128 0x1
+ 981 03b3 53       		.byte	0x53
+ 982 03b4 03       		.uleb128 0x3
+ 983 03b5 0A       		.byte	0xa
+ 984 03b6 5203     		.2byte	0x352
+ 985 03b8 08       		.uleb128 0x8
+ 986 03b9 02       		.uleb128 0x2
+ 987 03ba 7D       		.byte	0x7d
+ 988 03bb 00       		.sleb128 0
+ 989 03bc 02       		.uleb128 0x2
+ 990 03bd 76       		.byte	0x76
+ 991 03be 00       		.sleb128 0
+ 992 03bf 00       		.byte	0
+ 993 03c0 0C       		.uleb128 0xc
+ 994 03c1 9A000000 		.4byte	.LVL45
+ 995 03c5 A9010000 		.4byte	0x1a9
+ 996 03c9 ED030000 		.4byte	0x3ed
+ 997 03cd 08       		.uleb128 0x8
+ 998 03ce 01       		.uleb128 0x1
+ 999 03cf 50       		.byte	0x50
+ 1000 03d0 02       		.uleb128 0x2
+ 1001 03d1 77       		.byte	0x77
+ 1002 03d2 00       		.sleb128 0
+ 1003 03d3 08       		.uleb128 0x8
+ 1004 03d4 01       		.uleb128 0x1
+ 1005 03d5 51       		.byte	0x51
+ 1006 03d6 01       		.uleb128 0x1
+ 1007 03d7 30       		.byte	0x30
+ 1008 03d8 08       		.uleb128 0x8
+ 1009 03d9 01       		.uleb128 0x1
+ 1010 03da 52       		.byte	0x52
+ 1011 03db 02       		.uleb128 0x2
+ 1012 03dc 08       		.byte	0x8
+ 1013 03dd FF       		.byte	0xff
+ 1014 03de 08       		.uleb128 0x8
+ 1015 03df 01       		.uleb128 0x1
+ 1016 03e0 53       		.byte	0x53
+ 1017 03e1 03       		.uleb128 0x3
+ 1018 03e2 0A       		.byte	0xa
+ 1019 03e3 5203     		.2byte	0x352
+ 1020 03e5 08       		.uleb128 0x8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 22
+
+
+ 1021 03e6 02       		.uleb128 0x2
+ 1022 03e7 7D       		.byte	0x7d
+ 1023 03e8 00       		.sleb128 0
+ 1024 03e9 02       		.uleb128 0x2
+ 1025 03ea 76       		.byte	0x76
+ 1026 03eb 00       		.sleb128 0
+ 1027 03ec 00       		.byte	0
+ 1028 03ed 0C       		.uleb128 0xc
+ 1029 03ee B0000000 		.4byte	.LVL48
+ 1030 03f2 A9010000 		.4byte	0x1a9
+ 1031 03f6 1B040000 		.4byte	0x41b
+ 1032 03fa 08       		.uleb128 0x8
+ 1033 03fb 01       		.uleb128 0x1
+ 1034 03fc 50       		.byte	0x50
+ 1035 03fd 02       		.uleb128 0x2
+ 1036 03fe 79       		.byte	0x79
+ 1037 03ff 00       		.sleb128 0
+ 1038 0400 08       		.uleb128 0x8
+ 1039 0401 01       		.uleb128 0x1
+ 1040 0402 51       		.byte	0x51
+ 1041 0403 01       		.uleb128 0x1
+ 1042 0404 3A       		.byte	0x3a
+ 1043 0405 08       		.uleb128 0x8
+ 1044 0406 01       		.uleb128 0x1
+ 1045 0407 52       		.byte	0x52
+ 1046 0408 02       		.uleb128 0x2
+ 1047 0409 08       		.byte	0x8
+ 1048 040a 55       		.byte	0x55
+ 1049 040b 08       		.uleb128 0x8
+ 1050 040c 01       		.uleb128 0x1
+ 1051 040d 53       		.byte	0x53
+ 1052 040e 03       		.uleb128 0x3
+ 1053 040f 0A       		.byte	0xa
+ 1054 0410 5203     		.2byte	0x352
+ 1055 0412 08       		.uleb128 0x8
+ 1056 0413 02       		.uleb128 0x2
+ 1057 0414 7D       		.byte	0x7d
+ 1058 0415 00       		.sleb128 0
+ 1059 0416 03       		.uleb128 0x3
+ 1060 0417 0A       		.byte	0xa
+ 1061 0418 3011     		.2byte	0x1130
+ 1062 041a 00       		.byte	0
+ 1063 041b 0C       		.uleb128 0xc
+ 1064 041c BA000000 		.4byte	.LVL51
+ 1065 0420 69090000 		.4byte	0x969
+ 1066 0424 2F040000 		.4byte	0x42f
+ 1067 0428 08       		.uleb128 0x8
+ 1068 0429 01       		.uleb128 0x1
+ 1069 042a 50       		.byte	0x50
+ 1070 042b 02       		.uleb128 0x2
+ 1071 042c 78       		.byte	0x78
+ 1072 042d 00       		.sleb128 0
+ 1073 042e 00       		.byte	0
+ 1074 042f 0C       		.uleb128 0xc
+ 1075 0430 C0000000 		.4byte	.LVL52
+ 1076 0434 74090000 		.4byte	0x974
+ 1077 0438 43040000 		.4byte	0x443
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 23
+
+
+ 1078 043c 08       		.uleb128 0x8
+ 1079 043d 01       		.uleb128 0x1
+ 1080 043e 50       		.byte	0x50
+ 1081 043f 02       		.uleb128 0x2
+ 1082 0440 77       		.byte	0x77
+ 1083 0441 00       		.sleb128 0
+ 1084 0442 00       		.byte	0
+ 1085 0443 0C       		.uleb128 0xc
+ 1086 0444 C8000000 		.4byte	.LVL53
+ 1087 0448 7F090000 		.4byte	0x97f
+ 1088 044c 57040000 		.4byte	0x457
+ 1089 0450 08       		.uleb128 0x8
+ 1090 0451 01       		.uleb128 0x1
+ 1091 0452 50       		.byte	0x50
+ 1092 0453 02       		.uleb128 0x2
+ 1093 0454 79       		.byte	0x79
+ 1094 0455 00       		.sleb128 0
+ 1095 0456 00       		.byte	0
+ 1096 0457 0C       		.uleb128 0xc
+ 1097 0458 DE000000 		.4byte	.LVL54
+ 1098 045c EF000000 		.4byte	0xef
+ 1099 0460 80040000 		.4byte	0x480
+ 1100 0464 08       		.uleb128 0x8
+ 1101 0465 01       		.uleb128 0x1
+ 1102 0466 50       		.byte	0x50
+ 1103 0467 01       		.uleb128 0x1
+ 1104 0468 31       		.byte	0x31
+ 1105 0469 08       		.uleb128 0x8
+ 1106 046a 01       		.uleb128 0x1
+ 1107 046b 51       		.byte	0x51
+ 1108 046c 01       		.uleb128 0x1
+ 1109 046d 30       		.byte	0x30
+ 1110 046e 08       		.uleb128 0x8
+ 1111 046f 01       		.uleb128 0x1
+ 1112 0470 52       		.byte	0x52
+ 1113 0471 01       		.uleb128 0x1
+ 1114 0472 30       		.byte	0x30
+ 1115 0473 08       		.uleb128 0x8
+ 1116 0474 01       		.uleb128 0x1
+ 1117 0475 53       		.byte	0x53
+ 1118 0476 01       		.uleb128 0x1
+ 1119 0477 30       		.byte	0x30
+ 1120 0478 08       		.uleb128 0x8
+ 1121 0479 02       		.uleb128 0x2
+ 1122 047a 7D       		.byte	0x7d
+ 1123 047b 00       		.sleb128 0
+ 1124 047c 02       		.uleb128 0x2
+ 1125 047d 76       		.byte	0x76
+ 1126 047e 00       		.sleb128 0
+ 1127 047f 00       		.byte	0
+ 1128 0480 0C       		.uleb128 0xc
+ 1129 0481 EC000000 		.4byte	.LVL55
+ 1130 0485 EF000000 		.4byte	0xef
+ 1131 0489 A9040000 		.4byte	0x4a9
+ 1132 048d 08       		.uleb128 0x8
+ 1133 048e 01       		.uleb128 0x1
+ 1134 048f 50       		.byte	0x50
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 24
+
+
+ 1135 0490 01       		.uleb128 0x1
+ 1136 0491 31       		.byte	0x31
+ 1137 0492 08       		.uleb128 0x8
+ 1138 0493 01       		.uleb128 0x1
+ 1139 0494 51       		.byte	0x51
+ 1140 0495 01       		.uleb128 0x1
+ 1141 0496 31       		.byte	0x31
+ 1142 0497 08       		.uleb128 0x8
+ 1143 0498 01       		.uleb128 0x1
+ 1144 0499 52       		.byte	0x52
+ 1145 049a 01       		.uleb128 0x1
+ 1146 049b 30       		.byte	0x30
+ 1147 049c 08       		.uleb128 0x8
+ 1148 049d 01       		.uleb128 0x1
+ 1149 049e 53       		.byte	0x53
+ 1150 049f 01       		.uleb128 0x1
+ 1151 04a0 30       		.byte	0x30
+ 1152 04a1 08       		.uleb128 0x8
+ 1153 04a2 02       		.uleb128 0x2
+ 1154 04a3 7D       		.byte	0x7d
+ 1155 04a4 00       		.sleb128 0
+ 1156 04a5 02       		.uleb128 0x2
+ 1157 04a6 76       		.byte	0x76
+ 1158 04a7 00       		.sleb128 0
+ 1159 04a8 00       		.byte	0
+ 1160 04a9 0C       		.uleb128 0xc
+ 1161 04aa FA000000 		.4byte	.LVL56
+ 1162 04ae EF000000 		.4byte	0xef
+ 1163 04b2 D2040000 		.4byte	0x4d2
+ 1164 04b6 08       		.uleb128 0x8
+ 1165 04b7 01       		.uleb128 0x1
+ 1166 04b8 50       		.byte	0x50
+ 1167 04b9 01       		.uleb128 0x1
+ 1168 04ba 30       		.byte	0x30
+ 1169 04bb 08       		.uleb128 0x8
+ 1170 04bc 01       		.uleb128 0x1
+ 1171 04bd 51       		.byte	0x51
+ 1172 04be 01       		.uleb128 0x1
+ 1173 04bf 31       		.byte	0x31
+ 1174 04c0 08       		.uleb128 0x8
+ 1175 04c1 01       		.uleb128 0x1
+ 1176 04c2 52       		.byte	0x52
+ 1177 04c3 01       		.uleb128 0x1
+ 1178 04c4 30       		.byte	0x30
+ 1179 04c5 08       		.uleb128 0x8
+ 1180 04c6 01       		.uleb128 0x1
+ 1181 04c7 53       		.byte	0x53
+ 1182 04c8 01       		.uleb128 0x1
+ 1183 04c9 30       		.byte	0x30
+ 1184 04ca 08       		.uleb128 0x8
+ 1185 04cb 02       		.uleb128 0x2
+ 1186 04cc 7D       		.byte	0x7d
+ 1187 04cd 00       		.sleb128 0
+ 1188 04ce 02       		.uleb128 0x2
+ 1189 04cf 76       		.byte	0x76
+ 1190 04d0 00       		.sleb128 0
+ 1191 04d1 00       		.byte	0
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 25
+
+
+ 1192 04d2 0C       		.uleb128 0xc
+ 1193 04d3 08010000 		.4byte	.LVL57
+ 1194 04d7 EF000000 		.4byte	0xef
+ 1195 04db FB040000 		.4byte	0x4fb
+ 1196 04df 08       		.uleb128 0x8
+ 1197 04e0 01       		.uleb128 0x1
+ 1198 04e1 50       		.byte	0x50
+ 1199 04e2 01       		.uleb128 0x1
+ 1200 04e3 30       		.byte	0x30
+ 1201 04e4 08       		.uleb128 0x8
+ 1202 04e5 01       		.uleb128 0x1
+ 1203 04e6 51       		.byte	0x51
+ 1204 04e7 01       		.uleb128 0x1
+ 1205 04e8 31       		.byte	0x31
+ 1206 04e9 08       		.uleb128 0x8
+ 1207 04ea 01       		.uleb128 0x1
+ 1208 04eb 52       		.byte	0x52
+ 1209 04ec 01       		.uleb128 0x1
+ 1210 04ed 31       		.byte	0x31
+ 1211 04ee 08       		.uleb128 0x8
+ 1212 04ef 01       		.uleb128 0x1
+ 1213 04f0 53       		.byte	0x53
+ 1214 04f1 01       		.uleb128 0x1
+ 1215 04f2 30       		.byte	0x30
+ 1216 04f3 08       		.uleb128 0x8
+ 1217 04f4 02       		.uleb128 0x2
+ 1218 04f5 7D       		.byte	0x7d
+ 1219 04f6 00       		.sleb128 0
+ 1220 04f7 02       		.uleb128 0x2
+ 1221 04f8 76       		.byte	0x76
+ 1222 04f9 00       		.sleb128 0
+ 1223 04fa 00       		.byte	0
+ 1224 04fb 0C       		.uleb128 0xc
+ 1225 04fc 16010000 		.4byte	.LVL58
+ 1226 0500 EF000000 		.4byte	0xef
+ 1227 0504 24050000 		.4byte	0x524
+ 1228 0508 08       		.uleb128 0x8
+ 1229 0509 01       		.uleb128 0x1
+ 1230 050a 50       		.byte	0x50
+ 1231 050b 01       		.uleb128 0x1
+ 1232 050c 30       		.byte	0x30
+ 1233 050d 08       		.uleb128 0x8
+ 1234 050e 01       		.uleb128 0x1
+ 1235 050f 51       		.byte	0x51
+ 1236 0510 01       		.uleb128 0x1
+ 1237 0511 30       		.byte	0x30
+ 1238 0512 08       		.uleb128 0x8
+ 1239 0513 01       		.uleb128 0x1
+ 1240 0514 52       		.byte	0x52
+ 1241 0515 01       		.uleb128 0x1
+ 1242 0516 31       		.byte	0x31
+ 1243 0517 08       		.uleb128 0x8
+ 1244 0518 01       		.uleb128 0x1
+ 1245 0519 53       		.byte	0x53
+ 1246 051a 01       		.uleb128 0x1
+ 1247 051b 30       		.byte	0x30
+ 1248 051c 08       		.uleb128 0x8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 26
+
+
+ 1249 051d 02       		.uleb128 0x2
+ 1250 051e 7D       		.byte	0x7d
+ 1251 051f 00       		.sleb128 0
+ 1252 0520 02       		.uleb128 0x2
+ 1253 0521 76       		.byte	0x76
+ 1254 0522 00       		.sleb128 0
+ 1255 0523 00       		.byte	0
+ 1256 0524 0C       		.uleb128 0xc
+ 1257 0525 24010000 		.4byte	.LVL59
+ 1258 0529 EF000000 		.4byte	0xef
+ 1259 052d 4D050000 		.4byte	0x54d
+ 1260 0531 08       		.uleb128 0x8
+ 1261 0532 01       		.uleb128 0x1
+ 1262 0533 50       		.byte	0x50
+ 1263 0534 01       		.uleb128 0x1
+ 1264 0535 30       		.byte	0x30
+ 1265 0536 08       		.uleb128 0x8
+ 1266 0537 01       		.uleb128 0x1
+ 1267 0538 51       		.byte	0x51
+ 1268 0539 01       		.uleb128 0x1
+ 1269 053a 30       		.byte	0x30
+ 1270 053b 08       		.uleb128 0x8
+ 1271 053c 01       		.uleb128 0x1
+ 1272 053d 52       		.byte	0x52
+ 1273 053e 01       		.uleb128 0x1
+ 1274 053f 31       		.byte	0x31
+ 1275 0540 08       		.uleb128 0x8
+ 1276 0541 01       		.uleb128 0x1
+ 1277 0542 53       		.byte	0x53
+ 1278 0543 01       		.uleb128 0x1
+ 1279 0544 31       		.byte	0x31
+ 1280 0545 08       		.uleb128 0x8
+ 1281 0546 02       		.uleb128 0x2
+ 1282 0547 7D       		.byte	0x7d
+ 1283 0548 00       		.sleb128 0
+ 1284 0549 02       		.uleb128 0x2
+ 1285 054a 76       		.byte	0x76
+ 1286 054b 00       		.sleb128 0
+ 1287 054c 00       		.byte	0
+ 1288 054d 0C       		.uleb128 0xc
+ 1289 054e 32010000 		.4byte	.LVL60
+ 1290 0552 EF000000 		.4byte	0xef
+ 1291 0556 76050000 		.4byte	0x576
+ 1292 055a 08       		.uleb128 0x8
+ 1293 055b 01       		.uleb128 0x1
+ 1294 055c 50       		.byte	0x50
+ 1295 055d 01       		.uleb128 0x1
+ 1296 055e 30       		.byte	0x30
+ 1297 055f 08       		.uleb128 0x8
+ 1298 0560 01       		.uleb128 0x1
+ 1299 0561 51       		.byte	0x51
+ 1300 0562 01       		.uleb128 0x1
+ 1301 0563 30       		.byte	0x30
+ 1302 0564 08       		.uleb128 0x8
+ 1303 0565 01       		.uleb128 0x1
+ 1304 0566 52       		.byte	0x52
+ 1305 0567 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 27
+
+
+ 1306 0568 30       		.byte	0x30
+ 1307 0569 08       		.uleb128 0x8
+ 1308 056a 01       		.uleb128 0x1
+ 1309 056b 53       		.byte	0x53
+ 1310 056c 01       		.uleb128 0x1
+ 1311 056d 31       		.byte	0x31
+ 1312 056e 08       		.uleb128 0x8
+ 1313 056f 02       		.uleb128 0x2
+ 1314 0570 7D       		.byte	0x7d
+ 1315 0571 00       		.sleb128 0
+ 1316 0572 02       		.uleb128 0x2
+ 1317 0573 76       		.byte	0x76
+ 1318 0574 00       		.sleb128 0
+ 1319 0575 00       		.byte	0
+ 1320 0576 0C       		.uleb128 0xc
+ 1321 0577 40010000 		.4byte	.LVL61
+ 1322 057b EF000000 		.4byte	0xef
+ 1323 057f 9F050000 		.4byte	0x59f
+ 1324 0583 08       		.uleb128 0x8
+ 1325 0584 01       		.uleb128 0x1
+ 1326 0585 50       		.byte	0x50
+ 1327 0586 01       		.uleb128 0x1
+ 1328 0587 31       		.byte	0x31
+ 1329 0588 08       		.uleb128 0x8
+ 1330 0589 01       		.uleb128 0x1
+ 1331 058a 51       		.byte	0x51
+ 1332 058b 01       		.uleb128 0x1
+ 1333 058c 30       		.byte	0x30
+ 1334 058d 08       		.uleb128 0x8
+ 1335 058e 01       		.uleb128 0x1
+ 1336 058f 52       		.byte	0x52
+ 1337 0590 01       		.uleb128 0x1
+ 1338 0591 30       		.byte	0x30
+ 1339 0592 08       		.uleb128 0x8
+ 1340 0593 01       		.uleb128 0x1
+ 1341 0594 53       		.byte	0x53
+ 1342 0595 01       		.uleb128 0x1
+ 1343 0596 31       		.byte	0x31
+ 1344 0597 08       		.uleb128 0x8
+ 1345 0598 02       		.uleb128 0x2
+ 1346 0599 7D       		.byte	0x7d
+ 1347 059a 00       		.sleb128 0
+ 1348 059b 02       		.uleb128 0x2
+ 1349 059c 76       		.byte	0x76
+ 1350 059d 00       		.sleb128 0
+ 1351 059e 00       		.byte	0
+ 1352 059f 0C       		.uleb128 0xc
+ 1353 05a0 58010000 		.4byte	.LVL63
+ 1354 05a4 EF000000 		.4byte	0xef
+ 1355 05a8 C8050000 		.4byte	0x5c8
+ 1356 05ac 08       		.uleb128 0x8
+ 1357 05ad 01       		.uleb128 0x1
+ 1358 05ae 50       		.byte	0x50
+ 1359 05af 01       		.uleb128 0x1
+ 1360 05b0 30       		.byte	0x30
+ 1361 05b1 08       		.uleb128 0x8
+ 1362 05b2 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 28
+
+
+ 1363 05b3 51       		.byte	0x51
+ 1364 05b4 01       		.uleb128 0x1
+ 1365 05b5 30       		.byte	0x30
+ 1366 05b6 08       		.uleb128 0x8
+ 1367 05b7 01       		.uleb128 0x1
+ 1368 05b8 52       		.byte	0x52
+ 1369 05b9 01       		.uleb128 0x1
+ 1370 05ba 30       		.byte	0x30
+ 1371 05bb 08       		.uleb128 0x8
+ 1372 05bc 01       		.uleb128 0x1
+ 1373 05bd 53       		.byte	0x53
+ 1374 05be 01       		.uleb128 0x1
+ 1375 05bf 31       		.byte	0x31
+ 1376 05c0 08       		.uleb128 0x8
+ 1377 05c1 02       		.uleb128 0x2
+ 1378 05c2 7D       		.byte	0x7d
+ 1379 05c3 00       		.sleb128 0
+ 1380 05c4 02       		.uleb128 0x2
+ 1381 05c5 76       		.byte	0x76
+ 1382 05c6 00       		.sleb128 0
+ 1383 05c7 00       		.byte	0
+ 1384 05c8 0C       		.uleb128 0xc
+ 1385 05c9 66010000 		.4byte	.LVL64
+ 1386 05cd EF000000 		.4byte	0xef
+ 1387 05d1 F1050000 		.4byte	0x5f1
+ 1388 05d5 08       		.uleb128 0x8
+ 1389 05d6 01       		.uleb128 0x1
+ 1390 05d7 50       		.byte	0x50
+ 1391 05d8 01       		.uleb128 0x1
+ 1392 05d9 30       		.byte	0x30
+ 1393 05da 08       		.uleb128 0x8
+ 1394 05db 01       		.uleb128 0x1
+ 1395 05dc 51       		.byte	0x51
+ 1396 05dd 01       		.uleb128 0x1
+ 1397 05de 30       		.byte	0x30
+ 1398 05df 08       		.uleb128 0x8
+ 1399 05e0 01       		.uleb128 0x1
+ 1400 05e1 52       		.byte	0x52
+ 1401 05e2 01       		.uleb128 0x1
+ 1402 05e3 31       		.byte	0x31
+ 1403 05e4 08       		.uleb128 0x8
+ 1404 05e5 01       		.uleb128 0x1
+ 1405 05e6 53       		.byte	0x53
+ 1406 05e7 01       		.uleb128 0x1
+ 1407 05e8 31       		.byte	0x31
+ 1408 05e9 08       		.uleb128 0x8
+ 1409 05ea 02       		.uleb128 0x2
+ 1410 05eb 7D       		.byte	0x7d
+ 1411 05ec 00       		.sleb128 0
+ 1412 05ed 02       		.uleb128 0x2
+ 1413 05ee 76       		.byte	0x76
+ 1414 05ef 00       		.sleb128 0
+ 1415 05f0 00       		.byte	0
+ 1416 05f1 0C       		.uleb128 0xc
+ 1417 05f2 74010000 		.4byte	.LVL65
+ 1418 05f6 EF000000 		.4byte	0xef
+ 1419 05fa 1A060000 		.4byte	0x61a
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 29
+
+
+ 1420 05fe 08       		.uleb128 0x8
+ 1421 05ff 01       		.uleb128 0x1
+ 1422 0600 50       		.byte	0x50
+ 1423 0601 01       		.uleb128 0x1
+ 1424 0602 30       		.byte	0x30
+ 1425 0603 08       		.uleb128 0x8
+ 1426 0604 01       		.uleb128 0x1
+ 1427 0605 51       		.byte	0x51
+ 1428 0606 01       		.uleb128 0x1
+ 1429 0607 30       		.byte	0x30
+ 1430 0608 08       		.uleb128 0x8
+ 1431 0609 01       		.uleb128 0x1
+ 1432 060a 52       		.byte	0x52
+ 1433 060b 01       		.uleb128 0x1
+ 1434 060c 31       		.byte	0x31
+ 1435 060d 08       		.uleb128 0x8
+ 1436 060e 01       		.uleb128 0x1
+ 1437 060f 53       		.byte	0x53
+ 1438 0610 01       		.uleb128 0x1
+ 1439 0611 30       		.byte	0x30
+ 1440 0612 08       		.uleb128 0x8
+ 1441 0613 02       		.uleb128 0x2
+ 1442 0614 7D       		.byte	0x7d
+ 1443 0615 00       		.sleb128 0
+ 1444 0616 02       		.uleb128 0x2
+ 1445 0617 76       		.byte	0x76
+ 1446 0618 00       		.sleb128 0
+ 1447 0619 00       		.byte	0
+ 1448 061a 0C       		.uleb128 0xc
+ 1449 061b 82010000 		.4byte	.LVL66
+ 1450 061f EF000000 		.4byte	0xef
+ 1451 0623 43060000 		.4byte	0x643
+ 1452 0627 08       		.uleb128 0x8
+ 1453 0628 01       		.uleb128 0x1
+ 1454 0629 50       		.byte	0x50
+ 1455 062a 01       		.uleb128 0x1
+ 1456 062b 30       		.byte	0x30
+ 1457 062c 08       		.uleb128 0x8
+ 1458 062d 01       		.uleb128 0x1
+ 1459 062e 51       		.byte	0x51
+ 1460 062f 01       		.uleb128 0x1
+ 1461 0630 31       		.byte	0x31
+ 1462 0631 08       		.uleb128 0x8
+ 1463 0632 01       		.uleb128 0x1
+ 1464 0633 52       		.byte	0x52
+ 1465 0634 01       		.uleb128 0x1
+ 1466 0635 31       		.byte	0x31
+ 1467 0636 08       		.uleb128 0x8
+ 1468 0637 01       		.uleb128 0x1
+ 1469 0638 53       		.byte	0x53
+ 1470 0639 01       		.uleb128 0x1
+ 1471 063a 30       		.byte	0x30
+ 1472 063b 08       		.uleb128 0x8
+ 1473 063c 02       		.uleb128 0x2
+ 1474 063d 7D       		.byte	0x7d
+ 1475 063e 00       		.sleb128 0
+ 1476 063f 02       		.uleb128 0x2
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 30
+
+
+ 1477 0640 76       		.byte	0x76
+ 1478 0641 00       		.sleb128 0
+ 1479 0642 00       		.byte	0
+ 1480 0643 0C       		.uleb128 0xc
+ 1481 0644 90010000 		.4byte	.LVL67
+ 1482 0648 EF000000 		.4byte	0xef
+ 1483 064c 6C060000 		.4byte	0x66c
+ 1484 0650 08       		.uleb128 0x8
+ 1485 0651 01       		.uleb128 0x1
+ 1486 0652 50       		.byte	0x50
+ 1487 0653 01       		.uleb128 0x1
+ 1488 0654 30       		.byte	0x30
+ 1489 0655 08       		.uleb128 0x8
+ 1490 0656 01       		.uleb128 0x1
+ 1491 0657 51       		.byte	0x51
+ 1492 0658 01       		.uleb128 0x1
+ 1493 0659 31       		.byte	0x31
+ 1494 065a 08       		.uleb128 0x8
+ 1495 065b 01       		.uleb128 0x1
+ 1496 065c 52       		.byte	0x52
+ 1497 065d 01       		.uleb128 0x1
+ 1498 065e 30       		.byte	0x30
+ 1499 065f 08       		.uleb128 0x8
+ 1500 0660 01       		.uleb128 0x1
+ 1501 0661 53       		.byte	0x53
+ 1502 0662 01       		.uleb128 0x1
+ 1503 0663 30       		.byte	0x30
+ 1504 0664 08       		.uleb128 0x8
+ 1505 0665 02       		.uleb128 0x2
+ 1506 0666 7D       		.byte	0x7d
+ 1507 0667 00       		.sleb128 0
+ 1508 0668 02       		.uleb128 0x2
+ 1509 0669 76       		.byte	0x76
+ 1510 066a 00       		.sleb128 0
+ 1511 066b 00       		.byte	0
+ 1512 066c 0C       		.uleb128 0xc
+ 1513 066d 9E010000 		.4byte	.LVL68
+ 1514 0671 EF000000 		.4byte	0xef
+ 1515 0675 95060000 		.4byte	0x695
+ 1516 0679 08       		.uleb128 0x8
+ 1517 067a 01       		.uleb128 0x1
+ 1518 067b 50       		.byte	0x50
+ 1519 067c 01       		.uleb128 0x1
+ 1520 067d 31       		.byte	0x31
+ 1521 067e 08       		.uleb128 0x8
+ 1522 067f 01       		.uleb128 0x1
+ 1523 0680 51       		.byte	0x51
+ 1524 0681 01       		.uleb128 0x1
+ 1525 0682 31       		.byte	0x31
+ 1526 0683 08       		.uleb128 0x8
+ 1527 0684 01       		.uleb128 0x1
+ 1528 0685 52       		.byte	0x52
+ 1529 0686 01       		.uleb128 0x1
+ 1530 0687 30       		.byte	0x30
+ 1531 0688 08       		.uleb128 0x8
+ 1532 0689 01       		.uleb128 0x1
+ 1533 068a 53       		.byte	0x53
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 31
+
+
+ 1534 068b 01       		.uleb128 0x1
+ 1535 068c 30       		.byte	0x30
+ 1536 068d 08       		.uleb128 0x8
+ 1537 068e 02       		.uleb128 0x2
+ 1538 068f 7D       		.byte	0x7d
+ 1539 0690 00       		.sleb128 0
+ 1540 0691 02       		.uleb128 0x2
+ 1541 0692 76       		.byte	0x76
+ 1542 0693 00       		.sleb128 0
+ 1543 0694 00       		.byte	0
+ 1544 0695 0C       		.uleb128 0xc
+ 1545 0696 AC010000 		.4byte	.LVL69
+ 1546 069a EF000000 		.4byte	0xef
+ 1547 069e BE060000 		.4byte	0x6be
+ 1548 06a2 08       		.uleb128 0x8
+ 1549 06a3 01       		.uleb128 0x1
+ 1550 06a4 50       		.byte	0x50
+ 1551 06a5 01       		.uleb128 0x1
+ 1552 06a6 31       		.byte	0x31
+ 1553 06a7 08       		.uleb128 0x8
+ 1554 06a8 01       		.uleb128 0x1
+ 1555 06a9 51       		.byte	0x51
+ 1556 06aa 01       		.uleb128 0x1
+ 1557 06ab 30       		.byte	0x30
+ 1558 06ac 08       		.uleb128 0x8
+ 1559 06ad 01       		.uleb128 0x1
+ 1560 06ae 52       		.byte	0x52
+ 1561 06af 01       		.uleb128 0x1
+ 1562 06b0 30       		.byte	0x30
+ 1563 06b1 08       		.uleb128 0x8
+ 1564 06b2 01       		.uleb128 0x1
+ 1565 06b3 53       		.byte	0x53
+ 1566 06b4 01       		.uleb128 0x1
+ 1567 06b5 30       		.byte	0x30
+ 1568 06b6 08       		.uleb128 0x8
+ 1569 06b7 02       		.uleb128 0x2
+ 1570 06b8 7D       		.byte	0x7d
+ 1571 06b9 00       		.sleb128 0
+ 1572 06ba 02       		.uleb128 0x2
+ 1573 06bb 76       		.byte	0x76
+ 1574 06bc 00       		.sleb128 0
+ 1575 06bd 00       		.byte	0
+ 1576 06be 0C       		.uleb128 0xc
+ 1577 06bf BA010000 		.4byte	.LVL70
+ 1578 06c3 EF000000 		.4byte	0xef
+ 1579 06c7 E7060000 		.4byte	0x6e7
+ 1580 06cb 08       		.uleb128 0x8
+ 1581 06cc 01       		.uleb128 0x1
+ 1582 06cd 50       		.byte	0x50
+ 1583 06ce 01       		.uleb128 0x1
+ 1584 06cf 31       		.byte	0x31
+ 1585 06d0 08       		.uleb128 0x8
+ 1586 06d1 01       		.uleb128 0x1
+ 1587 06d2 51       		.byte	0x51
+ 1588 06d3 01       		.uleb128 0x1
+ 1589 06d4 30       		.byte	0x30
+ 1590 06d5 08       		.uleb128 0x8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 32
+
+
+ 1591 06d6 01       		.uleb128 0x1
+ 1592 06d7 52       		.byte	0x52
+ 1593 06d8 01       		.uleb128 0x1
+ 1594 06d9 30       		.byte	0x30
+ 1595 06da 08       		.uleb128 0x8
+ 1596 06db 01       		.uleb128 0x1
+ 1597 06dc 53       		.byte	0x53
+ 1598 06dd 01       		.uleb128 0x1
+ 1599 06de 31       		.byte	0x31
+ 1600 06df 08       		.uleb128 0x8
+ 1601 06e0 02       		.uleb128 0x2
+ 1602 06e1 7D       		.byte	0x7d
+ 1603 06e2 00       		.sleb128 0
+ 1604 06e3 02       		.uleb128 0x2
+ 1605 06e4 76       		.byte	0x76
+ 1606 06e5 00       		.sleb128 0
+ 1607 06e6 00       		.byte	0
+ 1608 06e7 0C       		.uleb128 0xc
+ 1609 06e8 C2010000 		.4byte	.LVL72
+ 1610 06ec 8A090000 		.4byte	0x98a
+ 1611 06f0 FA060000 		.4byte	0x6fa
+ 1612 06f4 08       		.uleb128 0x8
+ 1613 06f5 01       		.uleb128 0x1
+ 1614 06f6 50       		.byte	0x50
+ 1615 06f7 01       		.uleb128 0x1
+ 1616 06f8 31       		.byte	0x31
+ 1617 06f9 00       		.byte	0
+ 1618 06fa 0C       		.uleb128 0xc
+ 1619 06fb C8010000 		.4byte	.LVL73
+ 1620 06ff 8A090000 		.4byte	0x98a
+ 1621 0703 0D070000 		.4byte	0x70d
+ 1622 0707 08       		.uleb128 0x8
+ 1623 0708 01       		.uleb128 0x1
+ 1624 0709 50       		.byte	0x50
+ 1625 070a 01       		.uleb128 0x1
+ 1626 070b 32       		.byte	0x32
+ 1627 070c 00       		.byte	0
+ 1628 070d 0C       		.uleb128 0xc
+ 1629 070e D2010000 		.4byte	.LVL74
+ 1630 0712 95090000 		.4byte	0x995
+ 1631 0716 31070000 		.4byte	0x731
+ 1632 071a 08       		.uleb128 0x8
+ 1633 071b 01       		.uleb128 0x1
+ 1634 071c 50       		.byte	0x50
+ 1635 071d 03       		.uleb128 0x3
+ 1636 071e 91       		.byte	0x91
+ 1637 071f E07D     		.sleb128 -288
+ 1638 0721 08       		.uleb128 0x8
+ 1639 0722 01       		.uleb128 0x1
+ 1640 0723 51       		.byte	0x51
+ 1641 0724 05       		.uleb128 0x5
+ 1642 0725 03       		.byte	0x3
+ 1643 0726 00000000 		.4byte	.LC0
+ 1644 072a 08       		.uleb128 0x8
+ 1645 072b 01       		.uleb128 0x1
+ 1646 072c 52       		.byte	0x52
+ 1647 072d 02       		.uleb128 0x2
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 33
+
+
+ 1648 072e 74       		.byte	0x74
+ 1649 072f 00       		.sleb128 0
+ 1650 0730 00       		.byte	0
+ 1651 0731 0C       		.uleb128 0xc
+ 1652 0732 DA010000 		.4byte	.LVL75
+ 1653 0736 A0090000 		.4byte	0x9a0
+ 1654 073a 49070000 		.4byte	0x749
+ 1655 073e 08       		.uleb128 0x8
+ 1656 073f 01       		.uleb128 0x1
+ 1657 0740 50       		.byte	0x50
+ 1658 0741 01       		.uleb128 0x1
+ 1659 0742 30       		.byte	0x30
+ 1660 0743 08       		.uleb128 0x8
+ 1661 0744 01       		.uleb128 0x1
+ 1662 0745 51       		.byte	0x51
+ 1663 0746 01       		.uleb128 0x1
+ 1664 0747 30       		.byte	0x30
+ 1665 0748 00       		.byte	0
+ 1666 0749 0C       		.uleb128 0xc
+ 1667 074a E0010000 		.4byte	.LVL76
+ 1668 074e AB090000 		.4byte	0x9ab
+ 1669 0752 5E070000 		.4byte	0x75e
+ 1670 0756 08       		.uleb128 0x8
+ 1671 0757 01       		.uleb128 0x1
+ 1672 0758 50       		.byte	0x50
+ 1673 0759 03       		.uleb128 0x3
+ 1674 075a 91       		.byte	0x91
+ 1675 075b E07D     		.sleb128 -288
+ 1676 075d 00       		.byte	0
+ 1677 075e 0C       		.uleb128 0xc
+ 1678 075f EA010000 		.4byte	.LVL77
+ 1679 0763 95090000 		.4byte	0x995
+ 1680 0767 82070000 		.4byte	0x782
+ 1681 076b 08       		.uleb128 0x8
+ 1682 076c 01       		.uleb128 0x1
+ 1683 076d 50       		.byte	0x50
+ 1684 076e 03       		.uleb128 0x3
+ 1685 076f 91       		.byte	0x91
+ 1686 0770 E07D     		.sleb128 -288
+ 1687 0772 08       		.uleb128 0x8
+ 1688 0773 01       		.uleb128 0x1
+ 1689 0774 51       		.byte	0x51
+ 1690 0775 05       		.uleb128 0x5
+ 1691 0776 03       		.byte	0x3
+ 1692 0777 0C000000 		.4byte	.LC1
+ 1693 077b 08       		.uleb128 0x8
+ 1694 077c 01       		.uleb128 0x1
+ 1695 077d 52       		.byte	0x52
+ 1696 077e 02       		.uleb128 0x2
+ 1697 077f 77       		.byte	0x77
+ 1698 0780 00       		.sleb128 0
+ 1699 0781 00       		.byte	0
+ 1700 0782 0C       		.uleb128 0xc
+ 1701 0783 F2010000 		.4byte	.LVL78
+ 1702 0787 A0090000 		.4byte	0x9a0
+ 1703 078b 9A070000 		.4byte	0x79a
+ 1704 078f 08       		.uleb128 0x8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 34
+
+
+ 1705 0790 01       		.uleb128 0x1
+ 1706 0791 50       		.byte	0x50
+ 1707 0792 01       		.uleb128 0x1
+ 1708 0793 31       		.byte	0x31
+ 1709 0794 08       		.uleb128 0x8
+ 1710 0795 01       		.uleb128 0x1
+ 1711 0796 51       		.byte	0x51
+ 1712 0797 01       		.uleb128 0x1
+ 1713 0798 30       		.byte	0x30
+ 1714 0799 00       		.byte	0
+ 1715 079a 0C       		.uleb128 0xc
+ 1716 079b F8010000 		.4byte	.LVL79
+ 1717 079f AB090000 		.4byte	0x9ab
+ 1718 07a3 AF070000 		.4byte	0x7af
+ 1719 07a7 08       		.uleb128 0x8
+ 1720 07a8 01       		.uleb128 0x1
+ 1721 07a9 50       		.byte	0x50
+ 1722 07aa 03       		.uleb128 0x3
+ 1723 07ab 91       		.byte	0x91
+ 1724 07ac E07D     		.sleb128 -288
+ 1725 07ae 00       		.byte	0
+ 1726 07af 0C       		.uleb128 0xc
+ 1727 07b0 02020000 		.4byte	.LVL80
+ 1728 07b4 95090000 		.4byte	0x995
+ 1729 07b8 D3070000 		.4byte	0x7d3
+ 1730 07bc 08       		.uleb128 0x8
+ 1731 07bd 01       		.uleb128 0x1
+ 1732 07be 50       		.byte	0x50
+ 1733 07bf 03       		.uleb128 0x3
+ 1734 07c0 91       		.byte	0x91
+ 1735 07c1 E07D     		.sleb128 -288
+ 1736 07c3 08       		.uleb128 0x8
+ 1737 07c4 01       		.uleb128 0x1
+ 1738 07c5 51       		.byte	0x51
+ 1739 07c6 05       		.uleb128 0x5
+ 1740 07c7 03       		.byte	0x3
+ 1741 07c8 14000000 		.4byte	.LC2
+ 1742 07cc 08       		.uleb128 0x8
+ 1743 07cd 01       		.uleb128 0x1
+ 1744 07ce 52       		.byte	0x52
+ 1745 07cf 02       		.uleb128 0x2
+ 1746 07d0 79       		.byte	0x79
+ 1747 07d1 00       		.sleb128 0
+ 1748 07d2 00       		.byte	0
+ 1749 07d3 0C       		.uleb128 0xc
+ 1750 07d4 0A020000 		.4byte	.LVL81
+ 1751 07d8 A0090000 		.4byte	0x9a0
+ 1752 07dc EB070000 		.4byte	0x7eb
+ 1753 07e0 08       		.uleb128 0x8
+ 1754 07e1 01       		.uleb128 0x1
+ 1755 07e2 50       		.byte	0x50
+ 1756 07e3 01       		.uleb128 0x1
+ 1757 07e4 38       		.byte	0x38
+ 1758 07e5 08       		.uleb128 0x8
+ 1759 07e6 01       		.uleb128 0x1
+ 1760 07e7 51       		.byte	0x51
+ 1761 07e8 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 35
+
+
+ 1762 07e9 30       		.byte	0x30
+ 1763 07ea 00       		.byte	0
+ 1764 07eb 07       		.uleb128 0x7
+ 1765 07ec 10020000 		.4byte	.LVL82
+ 1766 07f0 AB090000 		.4byte	0x9ab
+ 1767 07f4 08       		.uleb128 0x8
+ 1768 07f5 01       		.uleb128 0x1
+ 1769 07f6 50       		.byte	0x50
+ 1770 07f7 03       		.uleb128 0x3
+ 1771 07f8 91       		.byte	0x91
+ 1772 07f9 E07D     		.sleb128 -288
+ 1773 07fb 00       		.byte	0
+ 1774 07fc 00       		.byte	0
+ 1775 07fd 12       		.uleb128 0x12
+ 1776 07fe B1000000 		.4byte	0xb1
+ 1777 0802 0D080000 		.4byte	0x80d
+ 1778 0806 13       		.uleb128 0x13
+ 1779 0807 BF000000 		.4byte	0xbf
+ 1780 080b FF       		.byte	0xff
+ 1781 080c 00       		.byte	0
+ 1782 080d 14       		.uleb128 0x14
+ 1783 080e 3B040000 		.4byte	.LASF32
+ 1784 0812 05       		.byte	0x5
+ 1785 0813 1207     		.2byte	0x712
+ 1786 0815 19080000 		.4byte	0x819
+ 1787 0819 15       		.uleb128 0x15
+ 1788 081a 8C000000 		.4byte	0x8c
+ 1789 081e 16       		.uleb128 0x16
+ 1790 081f AB020000 		.4byte	.LASF33
+ 1791 0823 01       		.byte	0x1
+ 1792 0824 14       		.byte	0x14
+ 1793 0825 97000000 		.4byte	0x97
+ 1794 0829 05       		.uleb128 0x5
+ 1795 082a 03       		.byte	0x3
+ 1796 082b 00000000 		.4byte	curPos
+ 1797 082f 16       		.uleb128 0x16
+ 1798 0830 74030000 		.4byte	.LASF34
+ 1799 0834 01       		.byte	0x1
+ 1800 0835 14       		.byte	0x14
+ 1801 0836 97000000 		.4byte	0x97
+ 1802 083a 05       		.uleb128 0x5
+ 1803 083b 03       		.byte	0x3
+ 1804 083c 00000000 		.4byte	oldPos
+ 1805 0840 17       		.uleb128 0x17
+ 1806 0841 1F010000 		.4byte	.LASF35
+ 1807 0845 1F010000 		.4byte	.LASF35
+ 1808 0849 06       		.byte	0x6
+ 1809 084a A5       		.byte	0xa5
+ 1810 084b 17       		.uleb128 0x17
+ 1811 084c 9C010000 		.4byte	.LASF36
+ 1812 0850 9C010000 		.4byte	.LASF36
+ 1813 0854 07       		.byte	0x7
+ 1814 0855 26       		.byte	0x26
+ 1815 0856 17       		.uleb128 0x17
+ 1816 0857 DE040000 		.4byte	.LASF37
+ 1817 085b DE040000 		.4byte	.LASF37
+ 1818 085f 08       		.byte	0x8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 36
+
+
+ 1819 0860 26       		.byte	0x26
+ 1820 0861 17       		.uleb128 0x17
+ 1821 0862 11020000 		.4byte	.LASF38
+ 1822 0866 11020000 		.4byte	.LASF38
+ 1823 086a 09       		.byte	0x9
+ 1824 086b 26       		.byte	0x26
+ 1825 086c 17       		.uleb128 0x17
+ 1826 086d 4E000000 		.4byte	.LASF39
+ 1827 0871 4E000000 		.4byte	.LASF39
+ 1828 0875 0A       		.byte	0xa
+ 1829 0876 26       		.byte	0x26
+ 1830 0877 17       		.uleb128 0x17
+ 1831 0878 D6040000 		.4byte	.LASF40
+ 1832 087c D6040000 		.4byte	.LASF40
+ 1833 0880 0B       		.byte	0xb
+ 1834 0881 76       		.byte	0x76
+ 1835 0882 17       		.uleb128 0x17
+ 1836 0883 C8000000 		.4byte	.LASF41
+ 1837 0887 C8000000 		.4byte	.LASF41
+ 1838 088b 0C       		.byte	0xc
+ 1839 088c 38       		.byte	0x38
+ 1840 088d 17       		.uleb128 0x17
+ 1841 088e 66000000 		.4byte	.LASF42
+ 1842 0892 66000000 		.4byte	.LASF42
+ 1843 0896 0D       		.byte	0xd
+ 1844 0897 92       		.byte	0x92
+ 1845 0898 17       		.uleb128 0x17
+ 1846 0899 56000000 		.4byte	.LASF43
+ 1847 089d 56000000 		.4byte	.LASF43
+ 1848 08a1 0E       		.byte	0xe
+ 1849 08a2 34       		.byte	0x34
+ 1850 08a3 17       		.uleb128 0x17
+ 1851 08a4 E6020000 		.4byte	.LASF44
+ 1852 08a8 E6020000 		.4byte	.LASF44
+ 1853 08ac 0F       		.byte	0xf
+ 1854 08ad 92       		.byte	0x92
+ 1855 08ae 17       		.uleb128 0x17
+ 1856 08af D6020000 		.4byte	.LASF45
+ 1857 08b3 D6020000 		.4byte	.LASF45
+ 1858 08b7 10       		.byte	0x10
+ 1859 08b8 34       		.byte	0x34
+ 1860 08b9 17       		.uleb128 0x17
+ 1861 08ba 0C030000 		.4byte	.LASF46
+ 1862 08be 0C030000 		.4byte	.LASF46
+ 1863 08c2 11       		.byte	0x11
+ 1864 08c3 3A       		.byte	0x3a
+ 1865 08c4 17       		.uleb128 0x17
+ 1866 08c5 A4000000 		.4byte	.LASF47
+ 1867 08c9 A4000000 		.4byte	.LASF47
+ 1868 08cd 12       		.byte	0x12
+ 1869 08ce 92       		.byte	0x92
+ 1870 08cf 17       		.uleb128 0x17
+ 1871 08d0 F2010000 		.4byte	.LASF48
+ 1872 08d4 F2010000 		.4byte	.LASF48
+ 1873 08d8 13       		.byte	0x13
+ 1874 08d9 93       		.byte	0x93
+ 1875 08da 17       		.uleb128 0x17
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 37
+
+
+ 1876 08db 17040000 		.4byte	.LASF49
+ 1877 08df 17040000 		.4byte	.LASF49
+ 1878 08e3 06       		.byte	0x6
+ 1879 08e4 95       		.byte	0x95
+ 1880 08e5 17       		.uleb128 0x17
+ 1881 08e6 3B030000 		.4byte	.LASF50
+ 1882 08ea 3B030000 		.4byte	.LASF50
+ 1883 08ee 0E       		.byte	0xe
+ 1884 08ef D1       		.byte	0xd1
+ 1885 08f0 17       		.uleb128 0x17
+ 1886 08f1 5D020000 		.4byte	.LASF51
+ 1887 08f5 5D020000 		.4byte	.LASF51
+ 1888 08f9 10       		.byte	0x10
+ 1889 08fa D1       		.byte	0xd1
+ 1890 08fb 17       		.uleb128 0x17
+ 1891 08fc F2020000 		.4byte	.LASF52
+ 1892 0900 F2020000 		.4byte	.LASF52
+ 1893 0904 11       		.byte	0x11
+ 1894 0905 3D       		.byte	0x3d
+ 1895 0906 17       		.uleb128 0x17
+ 1896 0907 5A030000 		.4byte	.LASF53
+ 1897 090b 5A030000 		.4byte	.LASF53
+ 1898 090f 0E       		.byte	0xe
+ 1899 0910 39       		.byte	0x39
+ 1900 0911 17       		.uleb128 0x17
+ 1901 0912 D9000000 		.4byte	.LASF54
+ 1902 0916 D9000000 		.4byte	.LASF54
+ 1903 091a 10       		.byte	0x10
+ 1904 091b 39       		.byte	0x39
+ 1905 091c 17       		.uleb128 0x17
+ 1906 091d 02010000 		.4byte	.LASF55
+ 1907 0921 02010000 		.4byte	.LASF55
+ 1908 0925 11       		.byte	0x11
+ 1909 0926 3F       		.byte	0x3f
+ 1910 0927 17       		.uleb128 0x17
+ 1911 0928 EA030000 		.4byte	.LASF56
+ 1912 092c EA030000 		.4byte	.LASF56
+ 1913 0930 13       		.byte	0x13
+ 1914 0931 99       		.byte	0x99
+ 1915 0932 17       		.uleb128 0x17
+ 1916 0933 19020000 		.4byte	.LASF57
+ 1917 0937 19020000 		.4byte	.LASF57
+ 1918 093b 06       		.byte	0x6
+ 1919 093c 99       		.byte	0x99
+ 1920 093d 17       		.uleb128 0x17
+ 1921 093e 3D020000 		.4byte	.LASF58
+ 1922 0942 3D020000 		.4byte	.LASF58
+ 1923 0946 13       		.byte	0x13
+ 1924 0947 9B       		.byte	0x9b
+ 1925 0948 17       		.uleb128 0x17
+ 1926 0949 87010000 		.4byte	.LASF59
+ 1927 094d 87010000 		.4byte	.LASF59
+ 1928 0951 0E       		.byte	0xe
+ 1929 0952 3A       		.byte	0x3a
+ 1930 0953 17       		.uleb128 0x17
+ 1931 0954 BC010000 		.4byte	.LASF60
+ 1932 0958 BC010000 		.4byte	.LASF60
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 38
+
+
+ 1933 095c 10       		.byte	0x10
+ 1934 095d 3A       		.byte	0x3a
+ 1935 095e 17       		.uleb128 0x17
+ 1936 095f D1030000 		.4byte	.LASF61
+ 1937 0963 D1030000 		.4byte	.LASF61
+ 1938 0967 11       		.byte	0x11
+ 1939 0968 42       		.byte	0x42
+ 1940 0969 17       		.uleb128 0x17
+ 1941 096a DF010000 		.4byte	.LASF62
+ 1942 096e DF010000 		.4byte	.LASF62
+ 1943 0972 0D       		.byte	0xd
+ 1944 0973 C3       		.byte	0xc3
+ 1945 0974 17       		.uleb128 0x17
+ 1946 0975 51010000 		.4byte	.LASF63
+ 1947 0979 51010000 		.4byte	.LASF63
+ 1948 097d 0F       		.byte	0xf
+ 1949 097e C3       		.byte	0xc3
+ 1950 097f 17       		.uleb128 0x17
+ 1951 0980 B5000000 		.4byte	.LASF64
+ 1952 0984 B5000000 		.4byte	.LASF64
+ 1953 0988 12       		.byte	0x12
+ 1954 0989 C3       		.byte	0xc3
+ 1955 098a 17       		.uleb128 0x17
+ 1956 098b 7C020000 		.4byte	.LASF65
+ 1957 098f 7C020000 		.4byte	.LASF65
+ 1958 0993 0C       		.byte	0xc
+ 1959 0994 3A       		.byte	0x3a
+ 1960 0995 17       		.uleb128 0x17
+ 1961 0996 CE020000 		.4byte	.LASF66
+ 1962 099a CE020000 		.4byte	.LASF66
+ 1963 099e 14       		.byte	0x14
+ 1964 099f E7       		.byte	0xe7
+ 1965 09a0 17       		.uleb128 0x17
+ 1966 09a1 BD030000 		.4byte	.LASF67
+ 1967 09a5 BD030000 		.4byte	.LASF67
+ 1968 09a9 0C       		.byte	0xc
+ 1969 09aa 3D       		.byte	0x3d
+ 1970 09ab 17       		.uleb128 0x17
+ 1971 09ac 24030000 		.4byte	.LASF68
+ 1972 09b0 24030000 		.4byte	.LASF68
+ 1973 09b4 0C       		.byte	0xc
+ 1974 09b5 3C       		.byte	0x3c
+ 1975 09b6 00       		.byte	0
+ 1976              		.section	.debug_abbrev,"",%progbits
+ 1977              	.Ldebug_abbrev0:
+ 1978 0000 01       		.uleb128 0x1
+ 1979 0001 11       		.uleb128 0x11
+ 1980 0002 01       		.byte	0x1
+ 1981 0003 25       		.uleb128 0x25
+ 1982 0004 0E       		.uleb128 0xe
+ 1983 0005 13       		.uleb128 0x13
+ 1984 0006 0B       		.uleb128 0xb
+ 1985 0007 03       		.uleb128 0x3
+ 1986 0008 0E       		.uleb128 0xe
+ 1987 0009 1B       		.uleb128 0x1b
+ 1988 000a 0E       		.uleb128 0xe
+ 1989 000b 55       		.uleb128 0x55
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 39
+
+
+ 1990 000c 17       		.uleb128 0x17
+ 1991 000d 11       		.uleb128 0x11
+ 1992 000e 01       		.uleb128 0x1
+ 1993 000f 10       		.uleb128 0x10
+ 1994 0010 17       		.uleb128 0x17
+ 1995 0011 00       		.byte	0
+ 1996 0012 00       		.byte	0
+ 1997 0013 02       		.uleb128 0x2
+ 1998 0014 24       		.uleb128 0x24
+ 1999 0015 00       		.byte	0
+ 2000 0016 0B       		.uleb128 0xb
+ 2001 0017 0B       		.uleb128 0xb
+ 2002 0018 3E       		.uleb128 0x3e
+ 2003 0019 0B       		.uleb128 0xb
+ 2004 001a 03       		.uleb128 0x3
+ 2005 001b 0E       		.uleb128 0xe
+ 2006 001c 00       		.byte	0
+ 2007 001d 00       		.byte	0
+ 2008 001e 03       		.uleb128 0x3
+ 2009 001f 16       		.uleb128 0x16
+ 2010 0020 00       		.byte	0
+ 2011 0021 03       		.uleb128 0x3
+ 2012 0022 0E       		.uleb128 0xe
+ 2013 0023 3A       		.uleb128 0x3a
+ 2014 0024 0B       		.uleb128 0xb
+ 2015 0025 3B       		.uleb128 0x3b
+ 2016 0026 0B       		.uleb128 0xb
+ 2017 0027 49       		.uleb128 0x49
+ 2018 0028 13       		.uleb128 0x13
+ 2019 0029 00       		.byte	0
+ 2020 002a 00       		.byte	0
+ 2021 002b 04       		.uleb128 0x4
+ 2022 002c 24       		.uleb128 0x24
+ 2023 002d 00       		.byte	0
+ 2024 002e 0B       		.uleb128 0xb
+ 2025 002f 0B       		.uleb128 0xb
+ 2026 0030 3E       		.uleb128 0x3e
+ 2027 0031 0B       		.uleb128 0xb
+ 2028 0032 03       		.uleb128 0x3
+ 2029 0033 08       		.uleb128 0x8
+ 2030 0034 00       		.byte	0
+ 2031 0035 00       		.byte	0
+ 2032 0036 05       		.uleb128 0x5
+ 2033 0037 16       		.uleb128 0x16
+ 2034 0038 00       		.byte	0
+ 2035 0039 03       		.uleb128 0x3
+ 2036 003a 0E       		.uleb128 0xe
+ 2037 003b 3A       		.uleb128 0x3a
+ 2038 003c 0B       		.uleb128 0xb
+ 2039 003d 3B       		.uleb128 0x3b
+ 2040 003e 05       		.uleb128 0x5
+ 2041 003f 49       		.uleb128 0x49
+ 2042 0040 13       		.uleb128 0x13
+ 2043 0041 00       		.byte	0
+ 2044 0042 00       		.byte	0
+ 2045 0043 06       		.uleb128 0x6
+ 2046 0044 2E       		.uleb128 0x2e
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 40
+
+
+ 2047 0045 01       		.byte	0x1
+ 2048 0046 3F       		.uleb128 0x3f
+ 2049 0047 19       		.uleb128 0x19
+ 2050 0048 03       		.uleb128 0x3
+ 2051 0049 0E       		.uleb128 0xe
+ 2052 004a 3A       		.uleb128 0x3a
+ 2053 004b 0B       		.uleb128 0xb
+ 2054 004c 3B       		.uleb128 0x3b
+ 2055 004d 0B       		.uleb128 0xb
+ 2056 004e 27       		.uleb128 0x27
+ 2057 004f 19       		.uleb128 0x19
+ 2058 0050 49       		.uleb128 0x49
+ 2059 0051 13       		.uleb128 0x13
+ 2060 0052 11       		.uleb128 0x11
+ 2061 0053 01       		.uleb128 0x1
+ 2062 0054 12       		.uleb128 0x12
+ 2063 0055 06       		.uleb128 0x6
+ 2064 0056 40       		.uleb128 0x40
+ 2065 0057 18       		.uleb128 0x18
+ 2066 0058 9742     		.uleb128 0x2117
+ 2067 005a 19       		.uleb128 0x19
+ 2068 005b 01       		.uleb128 0x1
+ 2069 005c 13       		.uleb128 0x13
+ 2070 005d 00       		.byte	0
+ 2071 005e 00       		.byte	0
+ 2072 005f 07       		.uleb128 0x7
+ 2073 0060 898201   		.uleb128 0x4109
+ 2074 0063 01       		.byte	0x1
+ 2075 0064 11       		.uleb128 0x11
+ 2076 0065 01       		.uleb128 0x1
+ 2077 0066 31       		.uleb128 0x31
+ 2078 0067 13       		.uleb128 0x13
+ 2079 0068 00       		.byte	0
+ 2080 0069 00       		.byte	0
+ 2081 006a 08       		.uleb128 0x8
+ 2082 006b 8A8201   		.uleb128 0x410a
+ 2083 006e 00       		.byte	0
+ 2084 006f 02       		.uleb128 0x2
+ 2085 0070 18       		.uleb128 0x18
+ 2086 0071 9142     		.uleb128 0x2111
+ 2087 0073 18       		.uleb128 0x18
+ 2088 0074 00       		.byte	0
+ 2089 0075 00       		.byte	0
+ 2090 0076 09       		.uleb128 0x9
+ 2091 0077 2E       		.uleb128 0x2e
+ 2092 0078 01       		.byte	0x1
+ 2093 0079 3F       		.uleb128 0x3f
+ 2094 007a 19       		.uleb128 0x19
+ 2095 007b 03       		.uleb128 0x3
+ 2096 007c 0E       		.uleb128 0xe
+ 2097 007d 3A       		.uleb128 0x3a
+ 2098 007e 0B       		.uleb128 0xb
+ 2099 007f 3B       		.uleb128 0x3b
+ 2100 0080 0B       		.uleb128 0xb
+ 2101 0081 27       		.uleb128 0x27
+ 2102 0082 19       		.uleb128 0x19
+ 2103 0083 11       		.uleb128 0x11
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 41
+
+
+ 2104 0084 01       		.uleb128 0x1
+ 2105 0085 12       		.uleb128 0x12
+ 2106 0086 06       		.uleb128 0x6
+ 2107 0087 40       		.uleb128 0x40
+ 2108 0088 18       		.uleb128 0x18
+ 2109 0089 9742     		.uleb128 0x2117
+ 2110 008b 19       		.uleb128 0x19
+ 2111 008c 01       		.uleb128 0x1
+ 2112 008d 13       		.uleb128 0x13
+ 2113 008e 00       		.byte	0
+ 2114 008f 00       		.byte	0
+ 2115 0090 0A       		.uleb128 0xa
+ 2116 0091 05       		.uleb128 0x5
+ 2117 0092 00       		.byte	0
+ 2118 0093 03       		.uleb128 0x3
+ 2119 0094 08       		.uleb128 0x8
+ 2120 0095 3A       		.uleb128 0x3a
+ 2121 0096 0B       		.uleb128 0xb
+ 2122 0097 3B       		.uleb128 0x3b
+ 2123 0098 0B       		.uleb128 0xb
+ 2124 0099 49       		.uleb128 0x49
+ 2125 009a 13       		.uleb128 0x13
+ 2126 009b 02       		.uleb128 0x2
+ 2127 009c 17       		.uleb128 0x17
+ 2128 009d 00       		.byte	0
+ 2129 009e 00       		.byte	0
+ 2130 009f 0B       		.uleb128 0xb
+ 2131 00a0 05       		.uleb128 0x5
+ 2132 00a1 00       		.byte	0
+ 2133 00a2 03       		.uleb128 0x3
+ 2134 00a3 0E       		.uleb128 0xe
+ 2135 00a4 3A       		.uleb128 0x3a
+ 2136 00a5 0B       		.uleb128 0xb
+ 2137 00a6 3B       		.uleb128 0x3b
+ 2138 00a7 0B       		.uleb128 0xb
+ 2139 00a8 49       		.uleb128 0x49
+ 2140 00a9 13       		.uleb128 0x13
+ 2141 00aa 02       		.uleb128 0x2
+ 2142 00ab 18       		.uleb128 0x18
+ 2143 00ac 00       		.byte	0
+ 2144 00ad 00       		.byte	0
+ 2145 00ae 0C       		.uleb128 0xc
+ 2146 00af 898201   		.uleb128 0x4109
+ 2147 00b2 01       		.byte	0x1
+ 2148 00b3 11       		.uleb128 0x11
+ 2149 00b4 01       		.uleb128 0x1
+ 2150 00b5 31       		.uleb128 0x31
+ 2151 00b6 13       		.uleb128 0x13
+ 2152 00b7 01       		.uleb128 0x1
+ 2153 00b8 13       		.uleb128 0x13
+ 2154 00b9 00       		.byte	0
+ 2155 00ba 00       		.byte	0
+ 2156 00bb 0D       		.uleb128 0xd
+ 2157 00bc 05       		.uleb128 0x5
+ 2158 00bd 00       		.byte	0
+ 2159 00be 03       		.uleb128 0x3
+ 2160 00bf 08       		.uleb128 0x8
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 42
+
+
+ 2161 00c0 3A       		.uleb128 0x3a
+ 2162 00c1 0B       		.uleb128 0xb
+ 2163 00c2 3B       		.uleb128 0x3b
+ 2164 00c3 0B       		.uleb128 0xb
+ 2165 00c4 49       		.uleb128 0x49
+ 2166 00c5 13       		.uleb128 0x13
+ 2167 00c6 02       		.uleb128 0x2
+ 2168 00c7 18       		.uleb128 0x18
+ 2169 00c8 00       		.byte	0
+ 2170 00c9 00       		.byte	0
+ 2171 00ca 0E       		.uleb128 0xe
+ 2172 00cb 34       		.uleb128 0x34
+ 2173 00cc 00       		.byte	0
+ 2174 00cd 03       		.uleb128 0x3
+ 2175 00ce 0E       		.uleb128 0xe
+ 2176 00cf 3A       		.uleb128 0x3a
+ 2177 00d0 0B       		.uleb128 0xb
+ 2178 00d1 3B       		.uleb128 0x3b
+ 2179 00d2 0B       		.uleb128 0xb
+ 2180 00d3 49       		.uleb128 0x49
+ 2181 00d4 13       		.uleb128 0x13
+ 2182 00d5 02       		.uleb128 0x2
+ 2183 00d6 17       		.uleb128 0x17
+ 2184 00d7 00       		.byte	0
+ 2185 00d8 00       		.byte	0
+ 2186 00d9 0F       		.uleb128 0xf
+ 2187 00da 2E       		.uleb128 0x2e
+ 2188 00db 01       		.byte	0x1
+ 2189 00dc 3F       		.uleb128 0x3f
+ 2190 00dd 19       		.uleb128 0x19
+ 2191 00de 03       		.uleb128 0x3
+ 2192 00df 0E       		.uleb128 0xe
+ 2193 00e0 3A       		.uleb128 0x3a
+ 2194 00e1 0B       		.uleb128 0xb
+ 2195 00e2 3B       		.uleb128 0x3b
+ 2196 00e3 0B       		.uleb128 0xb
+ 2197 00e4 27       		.uleb128 0x27
+ 2198 00e5 19       		.uleb128 0x19
+ 2199 00e6 49       		.uleb128 0x49
+ 2200 00e7 13       		.uleb128 0x13
+ 2201 00e8 8701     		.uleb128 0x87
+ 2202 00ea 19       		.uleb128 0x19
+ 2203 00eb 11       		.uleb128 0x11
+ 2204 00ec 01       		.uleb128 0x1
+ 2205 00ed 12       		.uleb128 0x12
+ 2206 00ee 06       		.uleb128 0x6
+ 2207 00ef 40       		.uleb128 0x40
+ 2208 00f0 18       		.uleb128 0x18
+ 2209 00f1 9742     		.uleb128 0x2117
+ 2210 00f3 19       		.uleb128 0x19
+ 2211 00f4 01       		.uleb128 0x1
+ 2212 00f5 13       		.uleb128 0x13
+ 2213 00f6 00       		.byte	0
+ 2214 00f7 00       		.byte	0
+ 2215 00f8 10       		.uleb128 0x10
+ 2216 00f9 34       		.uleb128 0x34
+ 2217 00fa 00       		.byte	0
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 43
+
+
+ 2218 00fb 03       		.uleb128 0x3
+ 2219 00fc 0E       		.uleb128 0xe
+ 2220 00fd 3A       		.uleb128 0x3a
+ 2221 00fe 0B       		.uleb128 0xb
+ 2222 00ff 3B       		.uleb128 0x3b
+ 2223 0100 0B       		.uleb128 0xb
+ 2224 0101 49       		.uleb128 0x49
+ 2225 0102 13       		.uleb128 0x13
+ 2226 0103 02       		.uleb128 0x2
+ 2227 0104 18       		.uleb128 0x18
+ 2228 0105 00       		.byte	0
+ 2229 0106 00       		.byte	0
+ 2230 0107 11       		.uleb128 0x11
+ 2231 0108 898201   		.uleb128 0x4109
+ 2232 010b 00       		.byte	0
+ 2233 010c 11       		.uleb128 0x11
+ 2234 010d 01       		.uleb128 0x1
+ 2235 010e 31       		.uleb128 0x31
+ 2236 010f 13       		.uleb128 0x13
+ 2237 0110 00       		.byte	0
+ 2238 0111 00       		.byte	0
+ 2239 0112 12       		.uleb128 0x12
+ 2240 0113 01       		.uleb128 0x1
+ 2241 0114 01       		.byte	0x1
+ 2242 0115 49       		.uleb128 0x49
+ 2243 0116 13       		.uleb128 0x13
+ 2244 0117 01       		.uleb128 0x1
+ 2245 0118 13       		.uleb128 0x13
+ 2246 0119 00       		.byte	0
+ 2247 011a 00       		.byte	0
+ 2248 011b 13       		.uleb128 0x13
+ 2249 011c 21       		.uleb128 0x21
+ 2250 011d 00       		.byte	0
+ 2251 011e 49       		.uleb128 0x49
+ 2252 011f 13       		.uleb128 0x13
+ 2253 0120 2F       		.uleb128 0x2f
+ 2254 0121 0B       		.uleb128 0xb
+ 2255 0122 00       		.byte	0
+ 2256 0123 00       		.byte	0
+ 2257 0124 14       		.uleb128 0x14
+ 2258 0125 34       		.uleb128 0x34
+ 2259 0126 00       		.byte	0
+ 2260 0127 03       		.uleb128 0x3
+ 2261 0128 0E       		.uleb128 0xe
+ 2262 0129 3A       		.uleb128 0x3a
+ 2263 012a 0B       		.uleb128 0xb
+ 2264 012b 3B       		.uleb128 0x3b
+ 2265 012c 05       		.uleb128 0x5
+ 2266 012d 49       		.uleb128 0x49
+ 2267 012e 13       		.uleb128 0x13
+ 2268 012f 3F       		.uleb128 0x3f
+ 2269 0130 19       		.uleb128 0x19
+ 2270 0131 3C       		.uleb128 0x3c
+ 2271 0132 19       		.uleb128 0x19
+ 2272 0133 00       		.byte	0
+ 2273 0134 00       		.byte	0
+ 2274 0135 15       		.uleb128 0x15
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 44
+
+
+ 2275 0136 35       		.uleb128 0x35
+ 2276 0137 00       		.byte	0
+ 2277 0138 49       		.uleb128 0x49
+ 2278 0139 13       		.uleb128 0x13
+ 2279 013a 00       		.byte	0
+ 2280 013b 00       		.byte	0
+ 2281 013c 16       		.uleb128 0x16
+ 2282 013d 34       		.uleb128 0x34
+ 2283 013e 00       		.byte	0
+ 2284 013f 03       		.uleb128 0x3
+ 2285 0140 0E       		.uleb128 0xe
+ 2286 0141 3A       		.uleb128 0x3a
+ 2287 0142 0B       		.uleb128 0xb
+ 2288 0143 3B       		.uleb128 0x3b
+ 2289 0144 0B       		.uleb128 0xb
+ 2290 0145 49       		.uleb128 0x49
+ 2291 0146 13       		.uleb128 0x13
+ 2292 0147 3F       		.uleb128 0x3f
+ 2293 0148 19       		.uleb128 0x19
+ 2294 0149 02       		.uleb128 0x2
+ 2295 014a 18       		.uleb128 0x18
+ 2296 014b 00       		.byte	0
+ 2297 014c 00       		.byte	0
+ 2298 014d 17       		.uleb128 0x17
+ 2299 014e 2E       		.uleb128 0x2e
+ 2300 014f 00       		.byte	0
+ 2301 0150 3F       		.uleb128 0x3f
+ 2302 0151 19       		.uleb128 0x19
+ 2303 0152 3C       		.uleb128 0x3c
+ 2304 0153 19       		.uleb128 0x19
+ 2305 0154 6E       		.uleb128 0x6e
+ 2306 0155 0E       		.uleb128 0xe
+ 2307 0156 03       		.uleb128 0x3
+ 2308 0157 0E       		.uleb128 0xe
+ 2309 0158 3A       		.uleb128 0x3a
+ 2310 0159 0B       		.uleb128 0xb
+ 2311 015a 3B       		.uleb128 0x3b
+ 2312 015b 0B       		.uleb128 0xb
+ 2313 015c 00       		.byte	0
+ 2314 015d 00       		.byte	0
+ 2315 015e 00       		.byte	0
+ 2316              		.section	.debug_loc,"",%progbits
+ 2317              	.Ldebug_loc0:
+ 2318              	.LLST0:
+ 2319 0000 00000000 		.4byte	.LVL1
+ 2320 0004 0A000000 		.4byte	.LVL2
+ 2321 0008 0100     		.2byte	0x1
+ 2322 000a 50       		.byte	0x50
+ 2323 000b 0A000000 		.4byte	.LVL2
+ 2324 000f 28000000 		.4byte	.LFE65
+ 2325 0013 0400     		.2byte	0x4
+ 2326 0015 F3       		.byte	0xf3
+ 2327 0016 01       		.uleb128 0x1
+ 2328 0017 50       		.byte	0x50
+ 2329 0018 9F       		.byte	0x9f
+ 2330 0019 00000000 		.4byte	0
+ 2331 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 45
+
+
+ 2332              	.LLST1:
+ 2333 0021 00000000 		.4byte	.LVL1
+ 2334 0025 0D000000 		.4byte	.LVL3-1
+ 2335 0029 0100     		.2byte	0x1
+ 2336 002b 51       		.byte	0x51
+ 2337 002c 0D000000 		.4byte	.LVL3-1
+ 2338 0030 28000000 		.4byte	.LFE65
+ 2339 0034 0100     		.2byte	0x1
+ 2340 0036 56       		.byte	0x56
+ 2341 0037 00000000 		.4byte	0
+ 2342 003b 00000000 		.4byte	0
+ 2343              	.LLST2:
+ 2344 003f 00000000 		.4byte	.LVL1
+ 2345 0043 0D000000 		.4byte	.LVL3-1
+ 2346 0047 0100     		.2byte	0x1
+ 2347 0049 52       		.byte	0x52
+ 2348 004a 0D000000 		.4byte	.LVL3-1
+ 2349 004e 28000000 		.4byte	.LFE65
+ 2350 0052 0100     		.2byte	0x1
+ 2351 0054 55       		.byte	0x55
+ 2352 0055 00000000 		.4byte	0
+ 2353 0059 00000000 		.4byte	0
+ 2354              	.LLST3:
+ 2355 005d 00000000 		.4byte	.LVL1
+ 2356 0061 0D000000 		.4byte	.LVL3-1
+ 2357 0065 0100     		.2byte	0x1
+ 2358 0067 53       		.byte	0x53
+ 2359 0068 0D000000 		.4byte	.LVL3-1
+ 2360 006c 28000000 		.4byte	.LFE65
+ 2361 0070 0100     		.2byte	0x1
+ 2362 0072 54       		.byte	0x54
+ 2363 0073 00000000 		.4byte	0
+ 2364 0077 00000000 		.4byte	0
+ 2365              	.LLST4:
+ 2366 007b 00000000 		.4byte	.LVL8
+ 2367 007f 04000000 		.4byte	.LVL9
+ 2368 0083 0100     		.2byte	0x1
+ 2369 0085 50       		.byte	0x50
+ 2370 0086 04000000 		.4byte	.LVL9
+ 2371 008a 18000000 		.4byte	.LFE66
+ 2372 008e 0400     		.2byte	0x4
+ 2373 0090 F3       		.byte	0xf3
+ 2374 0091 01       		.uleb128 0x1
+ 2375 0092 50       		.byte	0x50
+ 2376 0093 9F       		.byte	0x9f
+ 2377 0094 00000000 		.4byte	0
+ 2378 0098 00000000 		.4byte	0
+ 2379              	.LLST5:
+ 2380 009c 00000000 		.4byte	.LVL8
+ 2381 00a0 0E000000 		.4byte	.LVL10
+ 2382 00a4 0100     		.2byte	0x1
+ 2383 00a6 52       		.byte	0x52
+ 2384 00a7 0E000000 		.4byte	.LVL10
+ 2385 00ab 18000000 		.4byte	.LFE66
+ 2386 00af 0400     		.2byte	0x4
+ 2387 00b1 F3       		.byte	0xf3
+ 2388 00b2 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 46
+
+
+ 2389 00b3 52       		.byte	0x52
+ 2390 00b4 9F       		.byte	0x9f
+ 2391 00b5 00000000 		.4byte	0
+ 2392 00b9 00000000 		.4byte	0
+ 2393              	.LLST6:
+ 2394 00bd 00000000 		.4byte	.LVL8
+ 2395 00c1 16000000 		.4byte	.LVL13
+ 2396 00c5 0200     		.2byte	0x2
+ 2397 00c7 91       		.byte	0x91
+ 2398 00c8 00       		.sleb128 0
+ 2399 00c9 16000000 		.4byte	.LVL13
+ 2400 00cd 18000000 		.4byte	.LFE66
+ 2401 00d1 0200     		.2byte	0x2
+ 2402 00d3 7D       		.byte	0x7d
+ 2403 00d4 00       		.sleb128 0
+ 2404 00d5 00000000 		.4byte	0
+ 2405 00d9 00000000 		.4byte	0
+ 2406              	.LLST7:
+ 2407 00dd 12000000 		.4byte	.LVL11
+ 2408 00e1 14000000 		.4byte	.LVL12
+ 2409 00e5 0600     		.2byte	0x6
+ 2410 00e7 73       		.byte	0x73
+ 2411 00e8 00       		.sleb128 0
+ 2412 00e9 70       		.byte	0x70
+ 2413 00ea 00       		.sleb128 0
+ 2414 00eb 22       		.byte	0x22
+ 2415 00ec 9F       		.byte	0x9f
+ 2416 00ed 14000000 		.4byte	.LVL12
+ 2417 00f1 18000000 		.4byte	.LFE66
+ 2418 00f5 0100     		.2byte	0x1
+ 2419 00f7 50       		.byte	0x50
+ 2420 00f8 00000000 		.4byte	0
+ 2421 00fc 00000000 		.4byte	0
+ 2422              	.LLST8:
+ 2423 0100 68000000 		.4byte	.LVL36
+ 2424 0104 8A000000 		.4byte	.LVL43
+ 2425 0108 0100     		.2byte	0x1
+ 2426 010a 58       		.byte	0x58
+ 2427 010b 00000000 		.4byte	0
+ 2428 010f 00000000 		.4byte	0
+ 2429              	.LLST9:
+ 2430 0113 6E000000 		.4byte	.LVL38
+ 2431 0117 9C000000 		.4byte	.LVL46
+ 2432 011b 0100     		.2byte	0x1
+ 2433 011d 57       		.byte	0x57
+ 2434 011e 00000000 		.4byte	0
+ 2435 0122 00000000 		.4byte	0
+ 2436              	.LLST10:
+ 2437 0126 60000000 		.4byte	.LVL34
+ 2438 012a 63000000 		.4byte	.LVL35-1
+ 2439 012e 0100     		.2byte	0x1
+ 2440 0130 50       		.byte	0x50
+ 2441 0131 63000000 		.4byte	.LVL35-1
+ 2442 0135 B2000000 		.4byte	.LVL49
+ 2443 0139 0100     		.2byte	0x1
+ 2444 013b 59       		.byte	0x59
+ 2445 013c 00000000 		.4byte	0
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 47
+
+
+ 2446 0140 00000000 		.4byte	0
+ 2447              	.LLST11:
+ 2448 0144 2C000000 		.4byte	.LVL22
+ 2449 0148 2E000000 		.4byte	.LVL23
+ 2450 014c 0200     		.2byte	0x2
+ 2451 014e 30       		.byte	0x30
+ 2452 014f 9F       		.byte	0x9f
+ 2453 0150 2E000000 		.4byte	.LVL23
+ 2454 0154 20020000 		.4byte	.LFE67
+ 2455 0158 0100     		.2byte	0x1
+ 2456 015a 55       		.byte	0x55
+ 2457 015b 00000000 		.4byte	0
+ 2458 015f 00000000 		.4byte	0
+ 2459              	.LLST12:
+ 2460 0163 2C000000 		.4byte	.LVL22
+ 2461 0167 2E000000 		.4byte	.LVL23
+ 2462 016b 0200     		.2byte	0x2
+ 2463 016d 30       		.byte	0x30
+ 2464 016e 9F       		.byte	0x9f
+ 2465 016f 74000000 		.4byte	.LVL40
+ 2466 0173 84000000 		.4byte	.LVL41
+ 2467 0177 0100     		.2byte	0x1
+ 2468 0179 50       		.byte	0x50
+ 2469 017a 84000000 		.4byte	.LVL41
+ 2470 017e 20020000 		.4byte	.LFE67
+ 2471 0182 0100     		.2byte	0x1
+ 2472 0184 54       		.byte	0x54
+ 2473 0185 00000000 		.4byte	0
+ 2474 0189 00000000 		.4byte	0
+ 2475              	.LLST13:
+ 2476 018d 8A000000 		.4byte	.LVL43
+ 2477 0191 96000000 		.4byte	.LVL44
+ 2478 0195 0100     		.2byte	0x1
+ 2479 0197 50       		.byte	0x50
+ 2480 0198 96000000 		.4byte	.LVL44
+ 2481 019c 20020000 		.4byte	.LFE67
+ 2482 01a0 0100     		.2byte	0x1
+ 2483 01a2 58       		.byte	0x58
+ 2484 01a3 00000000 		.4byte	0
+ 2485 01a7 00000000 		.4byte	0
+ 2486              	.LLST14:
+ 2487 01ab 9C000000 		.4byte	.LVL46
+ 2488 01af AC000000 		.4byte	.LVL47
+ 2489 01b3 0100     		.2byte	0x1
+ 2490 01b5 50       		.byte	0x50
+ 2491 01b6 AC000000 		.4byte	.LVL47
+ 2492 01ba 20020000 		.4byte	.LFE67
+ 2493 01be 0100     		.2byte	0x1
+ 2494 01c0 57       		.byte	0x57
+ 2495 01c1 00000000 		.4byte	0
+ 2496 01c5 00000000 		.4byte	0
+ 2497              	.LLST15:
+ 2498 01c9 B2000000 		.4byte	.LVL49
+ 2499 01cd B6000000 		.4byte	.LVL50
+ 2500 01d1 0100     		.2byte	0x1
+ 2501 01d3 50       		.byte	0x50
+ 2502 01d4 B6000000 		.4byte	.LVL50
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 48
+
+
+ 2503 01d8 20020000 		.4byte	.LFE67
+ 2504 01dc 0100     		.2byte	0x1
+ 2505 01de 59       		.byte	0x59
+ 2506 01df 00000000 		.4byte	0
+ 2507 01e3 00000000 		.4byte	0
+ 2508              		.section	.debug_aranges,"",%progbits
+ 2509 0000 34000000 		.4byte	0x34
+ 2510 0004 0200     		.2byte	0x2
+ 2511 0006 00000000 		.4byte	.Ldebug_info0
+ 2512 000a 04       		.byte	0x4
+ 2513 000b 00       		.byte	0
+ 2514 000c 0000     		.2byte	0
+ 2515 000e 0000     		.2byte	0
+ 2516 0010 00000000 		.4byte	.LFB64
+ 2517 0014 14000000 		.4byte	.LFE64-.LFB64
+ 2518 0018 00000000 		.4byte	.LFB65
+ 2519 001c 28000000 		.4byte	.LFE65-.LFB65
+ 2520 0020 00000000 		.4byte	.LFB66
+ 2521 0024 18000000 		.4byte	.LFE66-.LFB66
+ 2522 0028 00000000 		.4byte	.LFB67
+ 2523 002c 20020000 		.4byte	.LFE67-.LFB67
+ 2524 0030 00000000 		.4byte	0
+ 2525 0034 00000000 		.4byte	0
+ 2526              		.section	.debug_ranges,"",%progbits
+ 2527              	.Ldebug_ranges0:
+ 2528 0000 00000000 		.4byte	.LFB64
+ 2529 0004 14000000 		.4byte	.LFE64
+ 2530 0008 00000000 		.4byte	.LFB65
+ 2531 000c 28000000 		.4byte	.LFE65
+ 2532 0010 00000000 		.4byte	.LFB66
+ 2533 0014 18000000 		.4byte	.LFE66
+ 2534 0018 00000000 		.4byte	.LFB67
+ 2535 001c 20020000 		.4byte	.LFE67
+ 2536 0020 00000000 		.4byte	0
+ 2537 0024 00000000 		.4byte	0
+ 2538              		.section	.debug_line,"",%progbits
+ 2539              	.Ldebug_line0:
+ 2540 0000 FF020000 		.section	.debug_str,"MS",%progbits,1
+ 2540      02007002 
+ 2540      00000201 
+ 2540      FB0E0D00 
+ 2540      01010101 
+ 2541              	.LASF71:
+ 2542 0000 433A5C55 		.ascii	"C:\\Users\\sinow\\Documents\\PSoC Creator\\Lab 5 - "
+ 2542      73657273 
+ 2542      5C73696E 
+ 2542      6F775C44 
+ 2542      6F63756D 
+ 2543 002e 46696E61 		.ascii	"Final Project\\Pot_Control.cydsn\000"
+ 2543      6C205072 
+ 2543      6F6A6563 
+ 2543      745C506F 
+ 2543      745F436F 
+ 2544              	.LASF39:
+ 2545 004e 445F5772 		.ascii	"D_Write\000"
+ 2545      69746500 
+ 2546              	.LASF43:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 49
+
+
+ 2547 0056 4144435F 		.ascii	"ADC_SAR_1_Start\000"
+ 2547      5341525F 
+ 2547      315F5374 
+ 2547      61727400 
+ 2548              	.LASF42:
+ 2549 0066 50574D5F 		.ascii	"PWM_1_Start\000"
+ 2549      315F5374 
+ 2549      61727400 
+ 2550              	.LASF28:
+ 2551 0072 74617267 		.ascii	"targetPos\000"
+ 2551      6574506F 
+ 2551      7300
+ 2552              	.LASF2:
+ 2553 007c 73686F72 		.ascii	"short int\000"
+ 2553      7420696E 
+ 2553      7400
+ 2554              	.LASF22:
+ 2555 0086 6D617070 		.ascii	"mapped_out\000"
+ 2555      65645F6F 
+ 2555      757400
+ 2556              	.LASF23:
+ 2557 0091 6C63644F 		.ascii	"lcdOutput\000"
+ 2557      75747075 
+ 2557      7400
+ 2558              	.LASF18:
+ 2559 009b 73697A65 		.ascii	"sizetype\000"
+ 2559      74797065 
+ 2559      00
+ 2560              	.LASF47:
+ 2561 00a4 50574D5F 		.ascii	"PWM_3_Start\000"
+ 2561      335F5374 
+ 2561      61727400 
+ 2562              	.LASF73:
+ 2563 00b0 6D61696E 		.ascii	"main\000"
+ 2563      00
+ 2564              	.LASF64:
+ 2565 00b5 50574D5F 		.ascii	"PWM_3_WriteCompare\000"
+ 2565      335F5772 
+ 2565      69746543 
+ 2565      6F6D7061 
+ 2565      726500
+ 2566              	.LASF41:
+ 2567 00c8 4C43445F 		.ascii	"LCD_Char_1_Start\000"
+ 2567      43686172 
+ 2567      5F315F53 
+ 2567      74617274 
+ 2567      00
+ 2568              	.LASF54:
+ 2569 00d9 4144435F 		.ascii	"ADC_SAR_2_IsEndConversion\000"
+ 2569      5341525F 
+ 2569      325F4973 
+ 2569      456E6443 
+ 2569      6F6E7665 
+ 2570              	.LASF13:
+ 2571 00f3 75696E74 		.ascii	"uint16\000"
+ 2571      313600
+ 2572              	.LASF11:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 50
+
+
+ 2573 00fa 75696E74 		.ascii	"uint8_t\000"
+ 2573      385F7400 
+ 2574              	.LASF55:
+ 2575 0102 4144435F 		.ascii	"ADC_DelSig_1_IsEndConversion\000"
+ 2575      44656C53 
+ 2575      69675F31 
+ 2575      5F497345 
+ 2575      6E64436F 
+ 2576              	.LASF35:
+ 2577 011f 43617053 		.ascii	"CapSense_CSD_GetCentroidPos\000"
+ 2577      656E7365 
+ 2577      5F435344 
+ 2577      5F476574 
+ 2577      43656E74 
+ 2578              	.LASF21:
+ 2579 013b 72616E67 		.ascii	"range_map\000"
+ 2579      655F6D61 
+ 2579      7000
+ 2580              	.LASF0:
+ 2581 0145 7369676E 		.ascii	"signed char\000"
+ 2581      65642063 
+ 2581      68617200 
+ 2582              	.LASF63:
+ 2583 0151 50574D5F 		.ascii	"PWM_2_WriteCompare\000"
+ 2583      325F5772 
+ 2583      69746543 
+ 2583      6F6D7061 
+ 2583      726500
+ 2584              	.LASF14:
+ 2585 0164 666C6F61 		.ascii	"float\000"
+ 2585      7400
+ 2586              	.LASF8:
+ 2587 016a 6C6F6E67 		.ascii	"long long int\000"
+ 2587      206C6F6E 
+ 2587      6720696E 
+ 2587      7400
+ 2588              	.LASF6:
+ 2589 0178 6C6F6E67 		.ascii	"long int\000"
+ 2589      20696E74 
+ 2589      00
+ 2590              	.LASF19:
+ 2591 0181 64656C61 		.ascii	"delay\000"
+ 2591      7900
+ 2592              	.LASF59:
+ 2593 0187 4144435F 		.ascii	"ADC_SAR_1_GetResult8\000"
+ 2593      5341525F 
+ 2593      315F4765 
+ 2593      74526573 
+ 2593      756C7438 
+ 2594              	.LASF36:
+ 2595 019c 415F5772 		.ascii	"A_Write\000"
+ 2595      69746500 
+ 2596              	.LASF30:
+ 2597 01a4 6D617070 		.ascii	"mapped_val2\000"
+ 2597      65645F76 
+ 2597      616C3200 
+ 2598              	.LASF31:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 51
+
+
+ 2599 01b0 6D617070 		.ascii	"mapped_val3\000"
+ 2599      65645F76 
+ 2599      616C3300 
+ 2600              	.LASF60:
+ 2601 01bc 4144435F 		.ascii	"ADC_SAR_2_GetResult8\000"
+ 2601      5341525F 
+ 2601      325F4765 
+ 2601      74526573 
+ 2601      756C7438 
+ 2602              	.LASF1:
+ 2603 01d1 756E7369 		.ascii	"unsigned char\000"
+ 2603      676E6564 
+ 2603      20636861 
+ 2603      7200
+ 2604              	.LASF62:
+ 2605 01df 50574D5F 		.ascii	"PWM_1_WriteCompare\000"
+ 2605      315F5772 
+ 2605      69746543 
+ 2605      6F6D7061 
+ 2605      726500
+ 2606              	.LASF48:
+ 2607 01f2 43617053 		.ascii	"CapSense_CSD_Start\000"
+ 2607      656E7365 
+ 2607      5F435344 
+ 2607      5F537461 
+ 2607      727400
+ 2608              	.LASF17:
+ 2609 0205 6C6F6E67 		.ascii	"long double\000"
+ 2609      20646F75 
+ 2609      626C6500 
+ 2610              	.LASF38:
+ 2611 0211 435F5772 		.ascii	"C_Write\000"
+ 2611      69746500 
+ 2612              	.LASF57:
+ 2613 0219 43617053 		.ascii	"CapSense_CSD_UpdateEnabledBaselines\000"
+ 2613      656E7365 
+ 2613      5F435344 
+ 2613      5F557064 
+ 2613      61746545 
+ 2614              	.LASF58:
+ 2615 023d 43617053 		.ascii	"CapSense_CSD_ScanEnabledWidgets\000"
+ 2615      656E7365 
+ 2615      5F435344 
+ 2615      5F536361 
+ 2615      6E456E61 
+ 2616              	.LASF51:
+ 2617 025d 4144435F 		.ascii	"ADC_SAR_2_StartConvert\000"
+ 2617      5341525F 
+ 2617      325F5374 
+ 2617      61727443 
+ 2617      6F6E7665 
+ 2618              	.LASF72:
+ 2619 0274 73746570 		.ascii	"stepper\000"
+ 2619      70657200 
+ 2620              	.LASF65:
+ 2621 027c 4C43445F 		.ascii	"LCD_Char_1_WriteControl\000"
+ 2621      43686172 
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 52
+
+
+ 2621      5F315F57 
+ 2621      72697465 
+ 2621      436F6E74 
+ 2622              	.LASF9:
+ 2623 0294 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2623      206C6F6E 
+ 2623      6720756E 
+ 2623      7369676E 
+ 2623      65642069 
+ 2624              	.LASF33:
+ 2625 02ab 63757250 		.ascii	"curPos\000"
+ 2625      6F7300
+ 2626              	.LASF10:
+ 2627 02b2 756E7369 		.ascii	"unsigned int\000"
+ 2627      676E6564 
+ 2627      20696E74 
+ 2627      00
+ 2628              	.LASF24:
+ 2629 02bf 76616C31 		.ascii	"val1\000"
+ 2629      00
+ 2630              	.LASF25:
+ 2631 02c4 76616C32 		.ascii	"val2\000"
+ 2631      00
+ 2632              	.LASF26:
+ 2633 02c9 76616C33 		.ascii	"val3\000"
+ 2633      00
+ 2634              	.LASF66:
+ 2635 02ce 73707269 		.ascii	"sprintf\000"
+ 2635      6E746600 
+ 2636              	.LASF45:
+ 2637 02d6 4144435F 		.ascii	"ADC_SAR_2_Start\000"
+ 2637      5341525F 
+ 2637      325F5374 
+ 2637      61727400 
+ 2638              	.LASF44:
+ 2639 02e6 50574D5F 		.ascii	"PWM_2_Start\000"
+ 2639      325F5374 
+ 2639      61727400 
+ 2640              	.LASF52:
+ 2641 02f2 4144435F 		.ascii	"ADC_DelSig_1_StartConvert\000"
+ 2641      44656C53 
+ 2641      69675F31 
+ 2641      5F537461 
+ 2641      7274436F 
+ 2642              	.LASF46:
+ 2643 030c 4144435F 		.ascii	"ADC_DelSig_1_Start\000"
+ 2643      44656C53 
+ 2643      69675F31 
+ 2643      5F537461 
+ 2643      727400
+ 2644              	.LASF16:
+ 2645 031f 63686172 		.ascii	"char\000"
+ 2645      00
+ 2646              	.LASF68:
+ 2647 0324 4C43445F 		.ascii	"LCD_Char_1_PrintString\000"
+ 2647      43686172 
+ 2647      5F315F50 
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 53
+
+
+ 2647      72696E74 
+ 2647      53747269 
+ 2648              	.LASF50:
+ 2649 033b 4144435F 		.ascii	"ADC_SAR_1_StartConvert\000"
+ 2649      5341525F 
+ 2649      315F5374 
+ 2649      61727443 
+ 2649      6F6E7665 
+ 2650              	.LASF12:
+ 2651 0352 696E7433 		.ascii	"int32_t\000"
+ 2651      325F7400 
+ 2652              	.LASF53:
+ 2653 035a 4144435F 		.ascii	"ADC_SAR_1_IsEndConversion\000"
+ 2653      5341525F 
+ 2653      315F4973 
+ 2653      456E6443 
+ 2653      6F6E7665 
+ 2654              	.LASF34:
+ 2655 0374 6F6C6450 		.ascii	"oldPos\000"
+ 2655      6F7300
+ 2656              	.LASF3:
+ 2657 037b 73686F72 		.ascii	"short unsigned int\000"
+ 2657      7420756E 
+ 2657      7369676E 
+ 2657      65642069 
+ 2657      6E7400
+ 2658              	.LASF70:
+ 2659 038e 6D61696E 		.ascii	"main.c\000"
+ 2659      2E6300
+ 2660              	.LASF20:
+ 2661 0395 43617053 		.ascii	"CapSense_DisplayState\000"
+ 2661      656E7365 
+ 2661      5F446973 
+ 2661      706C6179 
+ 2661      53746174 
+ 2662              	.LASF7:
+ 2663 03ab 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2663      20756E73 
+ 2663      69676E65 
+ 2663      6420696E 
+ 2663      7400
+ 2664              	.LASF67:
+ 2665 03bd 4C43445F 		.ascii	"LCD_Char_1_Position\000"
+ 2665      43686172 
+ 2665      5F315F50 
+ 2665      6F736974 
+ 2665      696F6E00 
+ 2666              	.LASF61:
+ 2667 03d1 4144435F 		.ascii	"ADC_DelSig_1_GetResult32\000"
+ 2667      44656C53 
+ 2667      69675F31 
+ 2667      5F476574 
+ 2667      52657375 
+ 2668              	.LASF56:
+ 2669 03ea 43617053 		.ascii	"CapSense_CSD_IsBusy\000"
+ 2669      656E7365 
+ 2669      5F435344 
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\cc2fTtvm.s 			page 54
+
+
+ 2669      5F497342 
+ 2669      75737900 
+ 2670              	.LASF5:
+ 2671 03fe 5F5F696E 		.ascii	"__int32_t\000"
+ 2671      7433325F 
+ 2671      7400
+ 2672              	.LASF27:
+ 2673 0408 73746570 		.ascii	"stepPos\000"
+ 2673      506F7300 
+ 2674              	.LASF15:
+ 2675 0410 646F7562 		.ascii	"double\000"
+ 2675      6C6500
+ 2676              	.LASF49:
+ 2677 0417 43617053 		.ascii	"CapSense_CSD_InitializeAllBaselines\000"
+ 2677      656E7365 
+ 2677      5F435344 
+ 2677      5F496E69 
+ 2677      7469616C 
+ 2678              	.LASF32:
+ 2679 043b 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2679      52784275 
+ 2679      66666572 
+ 2679      00
+ 2680              	.LASF69:
+ 2681 0448 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2681      43313120 
+ 2681      352E342E 
+ 2681      31203230 
+ 2681      31363036 
+ 2682 047b 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2682      20726576 
+ 2682      6973696F 
+ 2682      6E203233 
+ 2682      37373135 
+ 2683 04ae 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2683      66756E63 
+ 2683      74696F6E 
+ 2683      2D736563 
+ 2683      74696F6E 
+ 2684              	.LASF40:
+ 2685 04d6 43794465 		.ascii	"CyDelay\000"
+ 2685      6C617900 
+ 2686              	.LASF37:
+ 2687 04de 425F5772 		.ascii	"B_Write\000"
+ 2687      69746500 
+ 2688              	.LASF29:
+ 2689 04e6 6D617070 		.ascii	"mapped_val1\000"
+ 2689      65645F76 
+ 2689      616C3100 
+ 2690              	.LASF4:
+ 2691 04f2 5F5F7569 		.ascii	"__uint8_t\000"
+ 2691      6E74385F 
+ 2691      7400
+ 2692              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

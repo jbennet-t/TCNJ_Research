@@ -1,0 +1,7 @@
+C:\Users\sinow\Documents\PSoC Creator\SimpleRobotArm\Pot_Control.cydsn\Pot_Control.cyprj|dde828e8-231a-4399-803e-e1d8d38b17f3
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|f27128b9-b62d-47a1-a096-770367ce8508
+C:\Users\sinow\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Downloads ( 4.2).cyprj|4c811cee-b392-4e17-8acc-3e9b43624a34
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|f3424c13-45e6-47ba-8dc7-28212bc42b86
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|f6fa45fc-1dc1-4b47-80c6-ca662feb0727
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|233c6044-662e-41c6-9f9e-8cb58b3eb8a9
+C:\Users\sinow\Documents\PSoC Creator\SimpleRobotArm\Demo.cydsn\Demo.cyprj|6957e8b7-a260-4fe1-9b69-e6eca44541b3

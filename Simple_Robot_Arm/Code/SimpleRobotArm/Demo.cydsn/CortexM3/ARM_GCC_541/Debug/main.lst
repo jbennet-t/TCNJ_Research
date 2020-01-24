@@ -1,0 +1,2121 @@
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	__aeabi_i2d
+  20              		.global	__aeabi_dmul
+  21              		.global	__aeabi_d2iz
+  22              		.section	.text.stepperCW,"ax",%progbits
+  23              		.align	2
+  24              		.global	stepperCW
+  25              		.thumb
+  26              		.thumb_func
+  27              		.type	stepperCW, %function
+  28              	stepperCW:
+  29              	.LFB64:
+  30              		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        **** Robotic Arm Demo 
+   3:main.c        **** 1/20/20
+   4:main.c        **** Goal: controlling 3 servos and stepper motor to form a simple 
+   5:main.c        **** 3-DOF robot arm, using touch sensor and potentiometer inputs
+   6:main.c        **** Authors: Jordan Sinoway
+   7:main.c        **** */
+   8:main.c        **** 
+   9:main.c        **** 
+  10:main.c        **** 
+  11:main.c        **** #include "project.h"
+  12:main.c        **** #include "stdio.h"
+  13:main.c        **** #include "string.h"
+  14:main.c        **** #include "math.h"
+  15:main.c        **** 
+  16:main.c        **** 
+  17:main.c        **** #define STEP_DELAY (1) //defining global delay for stepper motor
+  18:main.c        **** 
+  19:main.c        **** 
+  20:main.c        **** 
+  21:main.c        **** void stepperCW(int degrees) //full wave stepping of stepper motor, 8 consecutive CW steps
+  22:main.c        **** {
+  31              		.loc 1 22 0
+  32              		.cfi_startproc
+  33              		@ args = 0, pretend = 0, frame = 0
+  34              		@ frame_needed = 0, uses_anonymous_args = 0
+  35              	.LVL0:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 2
+
+
+  36 0000 38B5     		push	{r3, r4, r5, lr}
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 3, -16
+  39              		.cfi_offset 4, -12
+  40              		.cfi_offset 5, -8
+  41              		.cfi_offset 14, -4
+  42 0002 0546     		mov	r5, r0
+  23:main.c        ****     int actualDegree = degrees * 0.703125;
+  43              		.loc 1 23 0
+  44 0004 FFF7FEFF 		bl	__aeabi_i2d
+  45              	.LVL1:
+  46 0008 0022     		movs	r2, #0
+  47 000a 1E4B     		ldr	r3, .L5
+  48 000c FFF7FEFF 		bl	__aeabi_dmul
+  49              	.LVL2:
+  50 0010 FFF7FEFF 		bl	__aeabi_d2iz
+  51              	.LVL3:
+  24:main.c        ****     int correctedTurn = degrees+(degrees - actualDegree);
+  52              		.loc 1 24 0
+  53 0014 C0EB4505 		rsb	r5, r0, r5, lsl #1
+  54              	.LVL4:
+  55              	.LBB2:
+  25:main.c        ****     
+  26:main.c        ****     for(int i = 0; i < correctedTurn; i++)
+  56              		.loc 1 26 0
+  57 0018 0024     		movs	r4, #0
+  58 001a 30E0     		b	.L2
+  59              	.LVL5:
+  60              	.L3:
+  27:main.c        ****     {
+  28:main.c        ****         Stepper_Write(0x8); // 1 0 0 0
+  61              		.loc 1 28 0 discriminator 3
+  62 001c 0820     		movs	r0, #8
+  63 001e FFF7FEFF 		bl	Stepper_Write
+  64              	.LVL6:
+  29:main.c        ****         CyDelay(STEP_DELAY);
+  65              		.loc 1 29 0 discriminator 3
+  66 0022 0120     		movs	r0, #1
+  67 0024 FFF7FEFF 		bl	CyDelay
+  68              	.LVL7:
+  30:main.c        ****         Stepper_Write(0xC); // 1 1 0 0
+  69              		.loc 1 30 0 discriminator 3
+  70 0028 0C20     		movs	r0, #12
+  71 002a FFF7FEFF 		bl	Stepper_Write
+  72              	.LVL8:
+  31:main.c        ****         CyDelay(STEP_DELAY);
+  73              		.loc 1 31 0 discriminator 3
+  74 002e 0120     		movs	r0, #1
+  75 0030 FFF7FEFF 		bl	CyDelay
+  76              	.LVL9:
+  32:main.c        ****         Stepper_Write(0x4); // 0 1 0 0 
+  77              		.loc 1 32 0 discriminator 3
+  78 0034 0420     		movs	r0, #4
+  79 0036 FFF7FEFF 		bl	Stepper_Write
+  80              	.LVL10:
+  33:main.c        ****         CyDelay(STEP_DELAY);
+  81              		.loc 1 33 0 discriminator 3
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 3
+
+
+  82 003a 0120     		movs	r0, #1
+  83 003c FFF7FEFF 		bl	CyDelay
+  84              	.LVL11:
+  34:main.c        ****         Stepper_Write(0x6); // 0 1 1 0
+  85              		.loc 1 34 0 discriminator 3
+  86 0040 0620     		movs	r0, #6
+  87 0042 FFF7FEFF 		bl	Stepper_Write
+  88              	.LVL12:
+  35:main.c        ****         CyDelay(STEP_DELAY);
+  89              		.loc 1 35 0 discriminator 3
+  90 0046 0120     		movs	r0, #1
+  91 0048 FFF7FEFF 		bl	CyDelay
+  92              	.LVL13:
+  36:main.c        ****         Stepper_Write(0x2); // 0 0 1 0 
+  93              		.loc 1 36 0 discriminator 3
+  94 004c 0220     		movs	r0, #2
+  95 004e FFF7FEFF 		bl	Stepper_Write
+  96              	.LVL14:
+  37:main.c        ****         CyDelay(STEP_DELAY);
+  97              		.loc 1 37 0 discriminator 3
+  98 0052 0120     		movs	r0, #1
+  99 0054 FFF7FEFF 		bl	CyDelay
+ 100              	.LVL15:
+  38:main.c        ****         Stepper_Write(0x3); // 0 0 1 1
+ 101              		.loc 1 38 0 discriminator 3
+ 102 0058 0320     		movs	r0, #3
+ 103 005a FFF7FEFF 		bl	Stepper_Write
+ 104              	.LVL16:
+  39:main.c        ****         CyDelay(STEP_DELAY);
+ 105              		.loc 1 39 0 discriminator 3
+ 106 005e 0120     		movs	r0, #1
+ 107 0060 FFF7FEFF 		bl	CyDelay
+ 108              	.LVL17:
+  40:main.c        ****         Stepper_Write(0x1); // 0 0 0 1
+ 109              		.loc 1 40 0 discriminator 3
+ 110 0064 0120     		movs	r0, #1
+ 111 0066 FFF7FEFF 		bl	Stepper_Write
+ 112              	.LVL18:
+  41:main.c        ****         CyDelay(STEP_DELAY);
+ 113              		.loc 1 41 0 discriminator 3
+ 114 006a 0120     		movs	r0, #1
+ 115 006c FFF7FEFF 		bl	CyDelay
+ 116              	.LVL19:
+  42:main.c        ****         Stepper_Write(0x9); // 1 0 0 1
+ 117              		.loc 1 42 0 discriminator 3
+ 118 0070 0920     		movs	r0, #9
+ 119 0072 FFF7FEFF 		bl	Stepper_Write
+ 120              	.LVL20:
+  43:main.c        ****         CyDelay(STEP_DELAY);
+ 121              		.loc 1 43 0 discriminator 3
+ 122 0076 0120     		movs	r0, #1
+ 123 0078 FFF7FEFF 		bl	CyDelay
+ 124              	.LVL21:
+  26:main.c        ****     {
+ 125              		.loc 1 26 0 discriminator 3
+ 126 007c 0134     		adds	r4, r4, #1
+ 127              	.LVL22:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 4
+
+
+ 128              	.L2:
+  26:main.c        ****     {
+ 129              		.loc 1 26 0 is_stmt 0 discriminator 1
+ 130 007e AC42     		cmp	r4, r5
+ 131 0080 CCDB     		blt	.L3
+ 132              	.LBE2:
+  44:main.c        ****     }
+  45:main.c        **** }
+ 133              		.loc 1 45 0 is_stmt 1
+ 134 0082 38BD     		pop	{r3, r4, r5, pc}
+ 135              	.LVL23:
+ 136              	.L6:
+ 137              		.align	2
+ 138              	.L5:
+ 139 0084 0080E63F 		.word	1072070656
+ 140              		.cfi_endproc
+ 141              	.LFE64:
+ 142              		.size	stepperCW, .-stepperCW
+ 143              		.section	.text.stepperCCW,"ax",%progbits
+ 144              		.align	2
+ 145              		.global	stepperCCW
+ 146              		.thumb
+ 147              		.thumb_func
+ 148              		.type	stepperCCW, %function
+ 149              	stepperCCW:
+ 150              	.LFB65:
+  46:main.c        **** 
+  47:main.c        **** void stepperCCW(int degrees)
+  48:main.c        **** {
+ 151              		.loc 1 48 0
+ 152              		.cfi_startproc
+ 153              		@ args = 0, pretend = 0, frame = 0
+ 154              		@ frame_needed = 0, uses_anonymous_args = 0
+ 155              	.LVL24:
+ 156 0000 38B5     		push	{r3, r4, r5, lr}
+ 157              		.cfi_def_cfa_offset 16
+ 158              		.cfi_offset 3, -16
+ 159              		.cfi_offset 4, -12
+ 160              		.cfi_offset 5, -8
+ 161              		.cfi_offset 14, -4
+ 162 0002 0546     		mov	r5, r0
+  49:main.c        ****     int actualDegree = degrees * 0.703125;
+ 163              		.loc 1 49 0
+ 164 0004 FFF7FEFF 		bl	__aeabi_i2d
+ 165              	.LVL25:
+ 166 0008 0022     		movs	r2, #0
+ 167 000a 1E4B     		ldr	r3, .L11
+ 168 000c FFF7FEFF 		bl	__aeabi_dmul
+ 169              	.LVL26:
+ 170 0010 FFF7FEFF 		bl	__aeabi_d2iz
+ 171              	.LVL27:
+  50:main.c        ****     int correctedTurn = degrees+(degrees - actualDegree);
+ 172              		.loc 1 50 0
+ 173 0014 C0EB4505 		rsb	r5, r0, r5, lsl #1
+ 174              	.LVL28:
+ 175              	.LBB3:
+  51:main.c        ****     
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 5
+
+
+  52:main.c        ****     for(int i = 0; i < correctedTurn; i++)
+ 176              		.loc 1 52 0
+ 177 0018 0024     		movs	r4, #0
+ 178 001a 30E0     		b	.L8
+ 179              	.LVL29:
+ 180              	.L9:
+  53:main.c        ****     {
+  54:main.c        ****         Stepper_Write(0x1); // 0 0 0 1
+ 181              		.loc 1 54 0 discriminator 3
+ 182 001c 0120     		movs	r0, #1
+ 183 001e FFF7FEFF 		bl	Stepper_Write
+ 184              	.LVL30:
+  55:main.c        ****         CyDelay(STEP_DELAY);
+ 185              		.loc 1 55 0 discriminator 3
+ 186 0022 0120     		movs	r0, #1
+ 187 0024 FFF7FEFF 		bl	CyDelay
+ 188              	.LVL31:
+  56:main.c        ****         Stepper_Write(0x3); // 0 0 1 1
+ 189              		.loc 1 56 0 discriminator 3
+ 190 0028 0320     		movs	r0, #3
+ 191 002a FFF7FEFF 		bl	Stepper_Write
+ 192              	.LVL32:
+  57:main.c        ****         CyDelay(STEP_DELAY);
+ 193              		.loc 1 57 0 discriminator 3
+ 194 002e 0120     		movs	r0, #1
+ 195 0030 FFF7FEFF 		bl	CyDelay
+ 196              	.LVL33:
+  58:main.c        ****         Stepper_Write(0x2); // 0 0 1 0
+ 197              		.loc 1 58 0 discriminator 3
+ 198 0034 0220     		movs	r0, #2
+ 199 0036 FFF7FEFF 		bl	Stepper_Write
+ 200              	.LVL34:
+  59:main.c        ****         CyDelay(STEP_DELAY);
+ 201              		.loc 1 59 0 discriminator 3
+ 202 003a 0120     		movs	r0, #1
+ 203 003c FFF7FEFF 		bl	CyDelay
+ 204              	.LVL35:
+  60:main.c        ****         Stepper_Write(0x6); // 0 1 1 0
+ 205              		.loc 1 60 0 discriminator 3
+ 206 0040 0620     		movs	r0, #6
+ 207 0042 FFF7FEFF 		bl	Stepper_Write
+ 208              	.LVL36:
+  61:main.c        ****         CyDelay(STEP_DELAY);
+ 209              		.loc 1 61 0 discriminator 3
+ 210 0046 0120     		movs	r0, #1
+ 211 0048 FFF7FEFF 		bl	CyDelay
+ 212              	.LVL37:
+  62:main.c        ****         Stepper_Write(0x4); // 0 1 0 0 
+ 213              		.loc 1 62 0 discriminator 3
+ 214 004c 0420     		movs	r0, #4
+ 215 004e FFF7FEFF 		bl	Stepper_Write
+ 216              	.LVL38:
+  63:main.c        ****         CyDelay(STEP_DELAY);
+ 217              		.loc 1 63 0 discriminator 3
+ 218 0052 0120     		movs	r0, #1
+ 219 0054 FFF7FEFF 		bl	CyDelay
+ 220              	.LVL39:
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 6
+
+
+  64:main.c        ****         Stepper_Write(0xC); // 1 1 0 0
+ 221              		.loc 1 64 0 discriminator 3
+ 222 0058 0C20     		movs	r0, #12
+ 223 005a FFF7FEFF 		bl	Stepper_Write
+ 224              	.LVL40:
+  65:main.c        ****         CyDelay(STEP_DELAY);
+ 225              		.loc 1 65 0 discriminator 3
+ 226 005e 0120     		movs	r0, #1
+ 227 0060 FFF7FEFF 		bl	CyDelay
+ 228              	.LVL41:
+  66:main.c        ****         Stepper_Write(0x8); // 1 0 0 0
+ 229              		.loc 1 66 0 discriminator 3
+ 230 0064 0820     		movs	r0, #8
+ 231 0066 FFF7FEFF 		bl	Stepper_Write
+ 232              	.LVL42:
+  67:main.c        ****         CyDelay(STEP_DELAY);
+ 233              		.loc 1 67 0 discriminator 3
+ 234 006a 0120     		movs	r0, #1
+ 235 006c FFF7FEFF 		bl	CyDelay
+ 236              	.LVL43:
+  68:main.c        ****         Stepper_Write(0x9); // 1 0 0 1
+ 237              		.loc 1 68 0 discriminator 3
+ 238 0070 0920     		movs	r0, #9
+ 239 0072 FFF7FEFF 		bl	Stepper_Write
+ 240              	.LVL44:
+  69:main.c        ****         CyDelay(STEP_DELAY);
+ 241              		.loc 1 69 0 discriminator 3
+ 242 0076 0120     		movs	r0, #1
+ 243 0078 FFF7FEFF 		bl	CyDelay
+ 244              	.LVL45:
+  52:main.c        ****     {
+ 245              		.loc 1 52 0 discriminator 3
+ 246 007c 0134     		adds	r4, r4, #1
+ 247              	.LVL46:
+ 248              	.L8:
+  52:main.c        ****     {
+ 249              		.loc 1 52 0 is_stmt 0 discriminator 1
+ 250 007e AC42     		cmp	r4, r5
+ 251 0080 CCDB     		blt	.L9
+ 252              	.LBE3:
+  70:main.c        ****     }
+  71:main.c        **** }
+ 253              		.loc 1 71 0 is_stmt 1
+ 254 0082 38BD     		pop	{r3, r4, r5, pc}
+ 255              	.LVL47:
+ 256              	.L12:
+ 257              		.align	2
+ 258              	.L11:
+ 259 0084 0080E63F 		.word	1072070656
+ 260              		.cfi_endproc
+ 261              	.LFE65:
+ 262              		.size	stepperCCW, .-stepperCCW
+ 263              		.section	.text.main,"ax",%progbits
+ 264              		.align	2
+ 265              		.global	main
+ 266              		.thumb
+ 267              		.thumb_func
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 7
+
+
+ 268              		.type	main, %function
+ 269              	main:
+ 270              	.LFB66:
+  72:main.c        **** 
+  73:main.c        **** 
+  74:main.c        **** 
+  75:main.c        **** 
+  76:main.c        **** 
+  77:main.c        **** int main(void)
+  78:main.c        **** {
+ 271              		.loc 1 78 0
+ 272              		.cfi_startproc
+ 273              		@ Volatile: function does not return.
+ 274              		@ args = 0, pretend = 0, frame = 0
+ 275              		@ frame_needed = 0, uses_anonymous_args = 0
+ 276 0000 08B5     		push	{r3, lr}
+ 277              		.cfi_def_cfa_offset 8
+ 278              		.cfi_offset 3, -8
+ 279              		.cfi_offset 14, -4
+  79:main.c        ****     CyGlobalIntEnable; 
+ 280              		.loc 1 79 0
+ 281              		.syntax unified
+ 282              	@ 79 "main.c" 1
+ 283 0002 62B6     		CPSIE   i
+ 284              	@ 0 "" 2
+  80:main.c        ****     
+  81:main.c        ****     PWM_1_Start(); //start PWM block 1
+ 285              		.loc 1 81 0
+ 286              		.thumb
+ 287              		.syntax unified
+ 288 0004 FFF7FEFF 		bl	PWM_1_Start
+ 289              	.LVL48:
+  82:main.c        ****     PWM_2_Start(); //start PWM block 2
+ 290              		.loc 1 82 0
+ 291 0008 FFF7FEFF 		bl	PWM_2_Start
+ 292              	.LVL49:
+  83:main.c        ****     PWM_3_Start();
+ 293              		.loc 1 83 0
+ 294 000c FFF7FEFF 		bl	PWM_3_Start
+ 295              	.LVL50:
+ 296              	.L14:
+  84:main.c        ****    
+  85:main.c        ****     for(;;)
+  86:main.c        ****     {
+  87:main.c        ****         stepperCCW(100);
+ 297              		.loc 1 87 0 discriminator 1
+ 298 0010 6420     		movs	r0, #100
+ 299 0012 FFF7FEFF 		bl	stepperCCW
+ 300              	.LVL51:
+  88:main.c        ****         PWM_2_WriteCompare(2000);
+ 301              		.loc 1 88 0 discriminator 1
+ 302 0016 4FF4FA60 		mov	r0, #2000
+ 303 001a FFF7FEFF 		bl	PWM_2_WriteCompare
+ 304              	.LVL52:
+  89:main.c        ****         CyDelay(450);
+ 305              		.loc 1 89 0 discriminator 1
+ 306 001e 4FF4E170 		mov	r0, #450
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 8
+
+
+ 307 0022 FFF7FEFF 		bl	CyDelay
+ 308              	.LVL53:
+  90:main.c        ****         PWM_1_WriteCompare(3000);
+ 309              		.loc 1 90 0 discriminator 1
+ 310 0026 40F6B830 		movw	r0, #3000
+ 311 002a FFF7FEFF 		bl	PWM_1_WriteCompare
+ 312              	.LVL54:
+  91:main.c        ****         CyDelay(450);
+ 313              		.loc 1 91 0 discriminator 1
+ 314 002e 4FF4E170 		mov	r0, #450
+ 315 0032 FFF7FEFF 		bl	CyDelay
+ 316              	.LVL55:
+  92:main.c        ****         PWM_2_WriteCompare(2200);
+ 317              		.loc 1 92 0 discriminator 1
+ 318 0036 40F69800 		movw	r0, #2200
+ 319 003a FFF7FEFF 		bl	PWM_2_WriteCompare
+ 320              	.LVL56:
+  93:main.c        ****         CyDelay(450);
+ 321              		.loc 1 93 0 discriminator 1
+ 322 003e 4FF4E170 		mov	r0, #450
+ 323 0042 FFF7FEFF 		bl	CyDelay
+ 324              	.LVL57:
+  94:main.c        ****         PWM_1_WriteCompare(2800);
+ 325              		.loc 1 94 0 discriminator 1
+ 326 0046 4FF42F60 		mov	r0, #2800
+ 327 004a FFF7FEFF 		bl	PWM_1_WriteCompare
+ 328              	.LVL58:
+  95:main.c        ****         CyDelay(450);
+ 329              		.loc 1 95 0 discriminator 1
+ 330 004e 4FF4E170 		mov	r0, #450
+ 331 0052 FFF7FEFF 		bl	CyDelay
+ 332              	.LVL59:
+  96:main.c        ****         
+  97:main.c        ****         stepperCW(50);
+ 333              		.loc 1 97 0 discriminator 1
+ 334 0056 3220     		movs	r0, #50
+ 335 0058 FFF7FEFF 		bl	stepperCW
+ 336              	.LVL60:
+  98:main.c        ****         
+  99:main.c        ****         PWM_2_WriteCompare(2400);
+ 337              		.loc 1 99 0 discriminator 1
+ 338 005c 4FF41660 		mov	r0, #2400
+ 339 0060 FFF7FEFF 		bl	PWM_2_WriteCompare
+ 340              	.LVL61:
+ 100:main.c        ****         CyDelay(450);
+ 341              		.loc 1 100 0 discriminator 1
+ 342 0064 4FF4E170 		mov	r0, #450
+ 343 0068 FFF7FEFF 		bl	CyDelay
+ 344              	.LVL62:
+ 101:main.c        ****         PWM_1_WriteCompare(2600);
+ 345              		.loc 1 101 0 discriminator 1
+ 346 006c 40F62820 		movw	r0, #2600
+ 347 0070 FFF7FEFF 		bl	PWM_1_WriteCompare
+ 348              	.LVL63:
+ 102:main.c        ****         CyDelay(450);
+ 349              		.loc 1 102 0 discriminator 1
+ 350 0074 4FF4E170 		mov	r0, #450
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 9
+
+
+ 351 0078 FFF7FEFF 		bl	CyDelay
+ 352              	.LVL64:
+ 103:main.c        ****         PWM_2_WriteCompare(2600);
+ 353              		.loc 1 103 0 discriminator 1
+ 354 007c 40F62820 		movw	r0, #2600
+ 355 0080 FFF7FEFF 		bl	PWM_2_WriteCompare
+ 356              	.LVL65:
+ 104:main.c        ****         CyDelay(450);
+ 357              		.loc 1 104 0 discriminator 1
+ 358 0084 4FF4E170 		mov	r0, #450
+ 359 0088 FFF7FEFF 		bl	CyDelay
+ 360              	.LVL66:
+ 105:main.c        ****         PWM_1_WriteCompare(2400);
+ 361              		.loc 1 105 0 discriminator 1
+ 362 008c 4FF41660 		mov	r0, #2400
+ 363 0090 FFF7FEFF 		bl	PWM_1_WriteCompare
+ 364              	.LVL67:
+ 106:main.c        ****         CyDelay(450);
+ 365              		.loc 1 106 0 discriminator 1
+ 366 0094 4FF4E170 		mov	r0, #450
+ 367 0098 FFF7FEFF 		bl	CyDelay
+ 368              	.LVL68:
+ 107:main.c        ****         
+ 108:main.c        ****         stepperCCW(50);
+ 369              		.loc 1 108 0 discriminator 1
+ 370 009c 3220     		movs	r0, #50
+ 371 009e FFF7FEFF 		bl	stepperCCW
+ 372              	.LVL69:
+ 109:main.c        ****         
+ 110:main.c        ****         PWM_2_WriteCompare(2800);
+ 373              		.loc 1 110 0 discriminator 1
+ 374 00a2 4FF42F60 		mov	r0, #2800
+ 375 00a6 FFF7FEFF 		bl	PWM_2_WriteCompare
+ 376              	.LVL70:
+ 111:main.c        ****         CyDelay(450);
+ 377              		.loc 1 111 0 discriminator 1
+ 378 00aa 4FF4E170 		mov	r0, #450
+ 379 00ae FFF7FEFF 		bl	CyDelay
+ 380              	.LVL71:
+ 112:main.c        ****         PWM_1_WriteCompare(2200);
+ 381              		.loc 1 112 0 discriminator 1
+ 382 00b2 40F69800 		movw	r0, #2200
+ 383 00b6 FFF7FEFF 		bl	PWM_1_WriteCompare
+ 384              	.LVL72:
+ 113:main.c        ****         CyDelay(450);
+ 385              		.loc 1 113 0 discriminator 1
+ 386 00ba 4FF4E170 		mov	r0, #450
+ 387 00be FFF7FEFF 		bl	CyDelay
+ 388              	.LVL73:
+ 114:main.c        ****         PWM_2_WriteCompare(3000);
+ 389              		.loc 1 114 0 discriminator 1
+ 390 00c2 40F6B830 		movw	r0, #3000
+ 391 00c6 FFF7FEFF 		bl	PWM_2_WriteCompare
+ 392              	.LVL74:
+ 115:main.c        ****         CyDelay(450);
+ 393              		.loc 1 115 0 discriminator 1
+ 394 00ca 4FF4E170 		mov	r0, #450
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 10
+
+
+ 395 00ce FFF7FEFF 		bl	CyDelay
+ 396              	.LVL75:
+ 116:main.c        ****         PWM_1_WriteCompare(2000);
+ 397              		.loc 1 116 0 discriminator 1
+ 398 00d2 4FF4FA60 		mov	r0, #2000
+ 399 00d6 FFF7FEFF 		bl	PWM_1_WriteCompare
+ 400              	.LVL76:
+ 117:main.c        ****         CyDelay(450);
+ 401              		.loc 1 117 0 discriminator 1
+ 402 00da 4FF4E170 		mov	r0, #450
+ 403 00de FFF7FEFF 		bl	CyDelay
+ 404              	.LVL77:
+ 118:main.c        ****         
+ 119:main.c        ****         PWM_3_WriteCompare(1000);
+ 405              		.loc 1 119 0 discriminator 1
+ 406 00e2 4FF47A70 		mov	r0, #1000
+ 407 00e6 FFF7FEFF 		bl	PWM_3_WriteCompare
+ 408              	.LVL78:
+ 120:main.c        ****         CyDelay(450);
+ 409              		.loc 1 120 0 discriminator 1
+ 410 00ea 4FF4E170 		mov	r0, #450
+ 411 00ee FFF7FEFF 		bl	CyDelay
+ 412              	.LVL79:
+ 121:main.c        ****         PWM_3_WriteCompare(4000);
+ 413              		.loc 1 121 0 discriminator 1
+ 414 00f2 4FF47A60 		mov	r0, #4000
+ 415 00f6 FFF7FEFF 		bl	PWM_3_WriteCompare
+ 416              	.LVL80:
+ 122:main.c        ****         CyDelay(450);
+ 417              		.loc 1 122 0 discriminator 1
+ 418 00fa 4FF4E170 		mov	r0, #450
+ 419 00fe FFF7FEFF 		bl	CyDelay
+ 420              	.LVL81:
+ 123:main.c        ****               
+ 124:main.c        ****         stepperCW(100);
+ 421              		.loc 1 124 0 discriminator 1
+ 422 0102 6420     		movs	r0, #100
+ 423 0104 FFF7FEFF 		bl	stepperCW
+ 424              	.LVL82:
+ 125:main.c        ****         CyDelay(200);
+ 425              		.loc 1 125 0 discriminator 1
+ 426 0108 C820     		movs	r0, #200
+ 427 010a FFF7FEFF 		bl	CyDelay
+ 428              	.LVL83:
+ 429 010e 7FE7     		b	.L14
+ 430              		.cfi_endproc
+ 431              	.LFE66:
+ 432              		.size	main, .-main
+ 433              		.text
+ 434              	.Letext0:
+ 435              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 436              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 437              		.file 4 "Generated_Source\\PSoC5/Stepper.h"
+ 438              		.file 5 "Generated_Source\\PSoC5/CyLib.h"
+ 439              		.file 6 "Generated_Source\\PSoC5/PWM_1.h"
+ 440              		.file 7 "Generated_Source\\PSoC5/PWM_2.h"
+ 441              		.file 8 "Generated_Source\\PSoC5/PWM_3.h"
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 11
+
+
+ 442              		.file 9 "Generated_Source\\PSoC5/core_cm3.h"
+ 443              		.section	.debug_info,"",%progbits
+ 444              	.Ldebug_info0:
+ 445 0000 F7060000 		.4byte	0x6f7
+ 446 0004 0400     		.2byte	0x4
+ 447 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 448 000a 04       		.byte	0x4
+ 449 000b 01       		.uleb128 0x1
+ 450 000c 52000000 		.4byte	.LASF29
+ 451 0010 0C       		.byte	0xc
+ 452 0011 9A010000 		.4byte	.LASF30
+ 453 0015 C4010000 		.4byte	.LASF31
+ 454 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 455 001d 00000000 		.4byte	0
+ 456 0021 00000000 		.4byte	.Ldebug_line0
+ 457 0025 02       		.uleb128 0x2
+ 458 0026 01       		.byte	0x1
+ 459 0027 06       		.byte	0x6
+ 460 0028 38020000 		.4byte	.LASF0
+ 461 002c 02       		.uleb128 0x2
+ 462 002d 01       		.byte	0x1
+ 463 002e 08       		.byte	0x8
+ 464 002f 44000000 		.4byte	.LASF1
+ 465 0033 02       		.uleb128 0x2
+ 466 0034 02       		.byte	0x2
+ 467 0035 05       		.byte	0x5
+ 468 0036 BA010000 		.4byte	.LASF2
+ 469 003a 02       		.uleb128 0x2
+ 470 003b 02       		.byte	0x2
+ 471 003c 07       		.byte	0x7
+ 472 003d 0A000000 		.4byte	.LASF3
+ 473 0041 03       		.uleb128 0x3
+ 474 0042 00000000 		.4byte	.LASF9
+ 475 0046 02       		.byte	0x2
+ 476 0047 3F       		.byte	0x3f
+ 477 0048 4C000000 		.4byte	0x4c
+ 478 004c 02       		.uleb128 0x2
+ 479 004d 04       		.byte	0x4
+ 480 004e 05       		.byte	0x5
+ 481 004f 0B020000 		.4byte	.LASF4
+ 482 0053 02       		.uleb128 0x2
+ 483 0054 04       		.byte	0x4
+ 484 0055 07       		.byte	0x7
+ 485 0056 E0000000 		.4byte	.LASF5
+ 486 005a 02       		.uleb128 0x2
+ 487 005b 08       		.byte	0x8
+ 488 005c 05       		.byte	0x5
+ 489 005d 8C010000 		.4byte	.LASF6
+ 490 0061 02       		.uleb128 0x2
+ 491 0062 08       		.byte	0x8
+ 492 0063 07       		.byte	0x7
+ 493 0064 44010000 		.4byte	.LASF7
+ 494 0068 04       		.uleb128 0x4
+ 495 0069 04       		.byte	0x4
+ 496 006a 05       		.byte	0x5
+ 497 006b 696E7400 		.ascii	"int\000"
+ 498 006f 02       		.uleb128 0x2
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 12
+
+
+ 499 0070 04       		.byte	0x4
+ 500 0071 07       		.byte	0x7
+ 501 0072 37010000 		.4byte	.LASF8
+ 502 0076 03       		.uleb128 0x3
+ 503 0077 68010000 		.4byte	.LASF10
+ 504 007b 03       		.byte	0x3
+ 505 007c 2C       		.byte	0x2c
+ 506 007d 41000000 		.4byte	0x41
+ 507 0081 02       		.uleb128 0x2
+ 508 0082 04       		.byte	0x4
+ 509 0083 04       		.byte	0x4
+ 510 0084 3E000000 		.4byte	.LASF11
+ 511 0088 02       		.uleb128 0x2
+ 512 0089 08       		.byte	0x8
+ 513 008a 04       		.byte	0x4
+ 514 008b 13010000 		.4byte	.LASF12
+ 515 008f 02       		.uleb128 0x2
+ 516 0090 01       		.byte	0x1
+ 517 0091 08       		.byte	0x8
+ 518 0092 14020000 		.4byte	.LASF13
+ 519 0096 02       		.uleb128 0x2
+ 520 0097 08       		.byte	0x8
+ 521 0098 04       		.byte	0x4
+ 522 0099 19020000 		.4byte	.LASF14
+ 523 009d 02       		.uleb128 0x2
+ 524 009e 04       		.byte	0x4
+ 525 009f 07       		.byte	0x7
+ 526 00a0 70010000 		.4byte	.LASF15
+ 527 00a4 05       		.uleb128 0x5
+ 528 00a5 4C020000 		.4byte	.LASF18
+ 529 00a9 01       		.byte	0x1
+ 530 00aa 15       		.byte	0x15
+ 531 00ab 00000000 		.4byte	.LFB64
+ 532 00af 88000000 		.4byte	.LFE64-.LFB64
+ 533 00b3 01       		.uleb128 0x1
+ 534 00b4 9C       		.byte	0x9c
+ 535 00b5 2A020000 		.4byte	0x22a
+ 536 00b9 06       		.uleb128 0x6
+ 537 00ba 0B010000 		.4byte	.LASF20
+ 538 00be 01       		.byte	0x1
+ 539 00bf 15       		.byte	0x15
+ 540 00c0 68000000 		.4byte	0x68
+ 541 00c4 00000000 		.4byte	.LLST0
+ 542 00c8 07       		.uleb128 0x7
+ 543 00c9 5B010000 		.4byte	.LASF16
+ 544 00cd 01       		.byte	0x1
+ 545 00ce 17       		.byte	0x17
+ 546 00cf 68000000 		.4byte	0x68
+ 547 00d3 2C000000 		.4byte	.LLST1
+ 548 00d7 07       		.uleb128 0x7
+ 549 00d8 30000000 		.4byte	.LASF17
+ 550 00dc 01       		.byte	0x1
+ 551 00dd 18       		.byte	0x18
+ 552 00de 68000000 		.4byte	0x68
+ 553 00e2 3F000000 		.4byte	.LLST2
+ 554 00e6 08       		.uleb128 0x8
+ 555 00e7 18000000 		.4byte	.LBB2
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 13
+
+
+ 556 00eb 6A000000 		.4byte	.LBE2-.LBB2
+ 557 00ef 09       		.uleb128 0x9
+ 558 00f0 6900     		.ascii	"i\000"
+ 559 00f2 01       		.byte	0x1
+ 560 00f3 1A       		.byte	0x1a
+ 561 00f4 68000000 		.4byte	0x68
+ 562 00f8 52000000 		.4byte	.LLST3
+ 563 00fc 0A       		.uleb128 0xa
+ 564 00fd 22000000 		.4byte	.LVL6
+ 565 0101 A2060000 		.4byte	0x6a2
+ 566 0105 0F010000 		.4byte	0x10f
+ 567 0109 0B       		.uleb128 0xb
+ 568 010a 01       		.uleb128 0x1
+ 569 010b 50       		.byte	0x50
+ 570 010c 01       		.uleb128 0x1
+ 571 010d 38       		.byte	0x38
+ 572 010e 00       		.byte	0
+ 573 010f 0A       		.uleb128 0xa
+ 574 0110 28000000 		.4byte	.LVL7
+ 575 0114 AD060000 		.4byte	0x6ad
+ 576 0118 22010000 		.4byte	0x122
+ 577 011c 0B       		.uleb128 0xb
+ 578 011d 01       		.uleb128 0x1
+ 579 011e 50       		.byte	0x50
+ 580 011f 01       		.uleb128 0x1
+ 581 0120 31       		.byte	0x31
+ 582 0121 00       		.byte	0
+ 583 0122 0A       		.uleb128 0xa
+ 584 0123 2E000000 		.4byte	.LVL8
+ 585 0127 A2060000 		.4byte	0x6a2
+ 586 012b 35010000 		.4byte	0x135
+ 587 012f 0B       		.uleb128 0xb
+ 588 0130 01       		.uleb128 0x1
+ 589 0131 50       		.byte	0x50
+ 590 0132 01       		.uleb128 0x1
+ 591 0133 3C       		.byte	0x3c
+ 592 0134 00       		.byte	0
+ 593 0135 0A       		.uleb128 0xa
+ 594 0136 34000000 		.4byte	.LVL9
+ 595 013a AD060000 		.4byte	0x6ad
+ 596 013e 48010000 		.4byte	0x148
+ 597 0142 0B       		.uleb128 0xb
+ 598 0143 01       		.uleb128 0x1
+ 599 0144 50       		.byte	0x50
+ 600 0145 01       		.uleb128 0x1
+ 601 0146 31       		.byte	0x31
+ 602 0147 00       		.byte	0
+ 603 0148 0A       		.uleb128 0xa
+ 604 0149 3A000000 		.4byte	.LVL10
+ 605 014d A2060000 		.4byte	0x6a2
+ 606 0151 5B010000 		.4byte	0x15b
+ 607 0155 0B       		.uleb128 0xb
+ 608 0156 01       		.uleb128 0x1
+ 609 0157 50       		.byte	0x50
+ 610 0158 01       		.uleb128 0x1
+ 611 0159 34       		.byte	0x34
+ 612 015a 00       		.byte	0
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 14
+
+
+ 613 015b 0A       		.uleb128 0xa
+ 614 015c 40000000 		.4byte	.LVL11
+ 615 0160 AD060000 		.4byte	0x6ad
+ 616 0164 6E010000 		.4byte	0x16e
+ 617 0168 0B       		.uleb128 0xb
+ 618 0169 01       		.uleb128 0x1
+ 619 016a 50       		.byte	0x50
+ 620 016b 01       		.uleb128 0x1
+ 621 016c 31       		.byte	0x31
+ 622 016d 00       		.byte	0
+ 623 016e 0A       		.uleb128 0xa
+ 624 016f 46000000 		.4byte	.LVL12
+ 625 0173 A2060000 		.4byte	0x6a2
+ 626 0177 81010000 		.4byte	0x181
+ 627 017b 0B       		.uleb128 0xb
+ 628 017c 01       		.uleb128 0x1
+ 629 017d 50       		.byte	0x50
+ 630 017e 01       		.uleb128 0x1
+ 631 017f 36       		.byte	0x36
+ 632 0180 00       		.byte	0
+ 633 0181 0A       		.uleb128 0xa
+ 634 0182 4C000000 		.4byte	.LVL13
+ 635 0186 AD060000 		.4byte	0x6ad
+ 636 018a 94010000 		.4byte	0x194
+ 637 018e 0B       		.uleb128 0xb
+ 638 018f 01       		.uleb128 0x1
+ 639 0190 50       		.byte	0x50
+ 640 0191 01       		.uleb128 0x1
+ 641 0192 31       		.byte	0x31
+ 642 0193 00       		.byte	0
+ 643 0194 0A       		.uleb128 0xa
+ 644 0195 52000000 		.4byte	.LVL14
+ 645 0199 A2060000 		.4byte	0x6a2
+ 646 019d A7010000 		.4byte	0x1a7
+ 647 01a1 0B       		.uleb128 0xb
+ 648 01a2 01       		.uleb128 0x1
+ 649 01a3 50       		.byte	0x50
+ 650 01a4 01       		.uleb128 0x1
+ 651 01a5 32       		.byte	0x32
+ 652 01a6 00       		.byte	0
+ 653 01a7 0A       		.uleb128 0xa
+ 654 01a8 58000000 		.4byte	.LVL15
+ 655 01ac AD060000 		.4byte	0x6ad
+ 656 01b0 BA010000 		.4byte	0x1ba
+ 657 01b4 0B       		.uleb128 0xb
+ 658 01b5 01       		.uleb128 0x1
+ 659 01b6 50       		.byte	0x50
+ 660 01b7 01       		.uleb128 0x1
+ 661 01b8 31       		.byte	0x31
+ 662 01b9 00       		.byte	0
+ 663 01ba 0A       		.uleb128 0xa
+ 664 01bb 5E000000 		.4byte	.LVL16
+ 665 01bf A2060000 		.4byte	0x6a2
+ 666 01c3 CD010000 		.4byte	0x1cd
+ 667 01c7 0B       		.uleb128 0xb
+ 668 01c8 01       		.uleb128 0x1
+ 669 01c9 50       		.byte	0x50
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 15
+
+
+ 670 01ca 01       		.uleb128 0x1
+ 671 01cb 33       		.byte	0x33
+ 672 01cc 00       		.byte	0
+ 673 01cd 0A       		.uleb128 0xa
+ 674 01ce 64000000 		.4byte	.LVL17
+ 675 01d2 AD060000 		.4byte	0x6ad
+ 676 01d6 E0010000 		.4byte	0x1e0
+ 677 01da 0B       		.uleb128 0xb
+ 678 01db 01       		.uleb128 0x1
+ 679 01dc 50       		.byte	0x50
+ 680 01dd 01       		.uleb128 0x1
+ 681 01de 31       		.byte	0x31
+ 682 01df 00       		.byte	0
+ 683 01e0 0A       		.uleb128 0xa
+ 684 01e1 6A000000 		.4byte	.LVL18
+ 685 01e5 A2060000 		.4byte	0x6a2
+ 686 01e9 F3010000 		.4byte	0x1f3
+ 687 01ed 0B       		.uleb128 0xb
+ 688 01ee 01       		.uleb128 0x1
+ 689 01ef 50       		.byte	0x50
+ 690 01f0 01       		.uleb128 0x1
+ 691 01f1 31       		.byte	0x31
+ 692 01f2 00       		.byte	0
+ 693 01f3 0A       		.uleb128 0xa
+ 694 01f4 70000000 		.4byte	.LVL19
+ 695 01f8 AD060000 		.4byte	0x6ad
+ 696 01fc 06020000 		.4byte	0x206
+ 697 0200 0B       		.uleb128 0xb
+ 698 0201 01       		.uleb128 0x1
+ 699 0202 50       		.byte	0x50
+ 700 0203 01       		.uleb128 0x1
+ 701 0204 31       		.byte	0x31
+ 702 0205 00       		.byte	0
+ 703 0206 0A       		.uleb128 0xa
+ 704 0207 76000000 		.4byte	.LVL20
+ 705 020b A2060000 		.4byte	0x6a2
+ 706 020f 19020000 		.4byte	0x219
+ 707 0213 0B       		.uleb128 0xb
+ 708 0214 01       		.uleb128 0x1
+ 709 0215 50       		.byte	0x50
+ 710 0216 01       		.uleb128 0x1
+ 711 0217 39       		.byte	0x39
+ 712 0218 00       		.byte	0
+ 713 0219 0C       		.uleb128 0xc
+ 714 021a 7C000000 		.4byte	.LVL21
+ 715 021e AD060000 		.4byte	0x6ad
+ 716 0222 0B       		.uleb128 0xb
+ 717 0223 01       		.uleb128 0x1
+ 718 0224 50       		.byte	0x50
+ 719 0225 01       		.uleb128 0x1
+ 720 0226 31       		.byte	0x31
+ 721 0227 00       		.byte	0
+ 722 0228 00       		.byte	0
+ 723 0229 00       		.byte	0
+ 724 022a 05       		.uleb128 0x5
+ 725 022b A1010000 		.4byte	.LASF19
+ 726 022f 01       		.byte	0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 16
+
+
+ 727 0230 2F       		.byte	0x2f
+ 728 0231 00000000 		.4byte	.LFB65
+ 729 0235 88000000 		.4byte	.LFE65-.LFB65
+ 730 0239 01       		.uleb128 0x1
+ 731 023a 9C       		.byte	0x9c
+ 732 023b B0030000 		.4byte	0x3b0
+ 733 023f 06       		.uleb128 0x6
+ 734 0240 0B010000 		.4byte	.LASF20
+ 735 0244 01       		.byte	0x1
+ 736 0245 2F       		.byte	0x2f
+ 737 0246 68000000 		.4byte	0x68
+ 738 024a 71000000 		.4byte	.LLST4
+ 739 024e 07       		.uleb128 0x7
+ 740 024f 5B010000 		.4byte	.LASF16
+ 741 0253 01       		.byte	0x1
+ 742 0254 31       		.byte	0x31
+ 743 0255 68000000 		.4byte	0x68
+ 744 0259 9D000000 		.4byte	.LLST5
+ 745 025d 07       		.uleb128 0x7
+ 746 025e 30000000 		.4byte	.LASF17
+ 747 0262 01       		.byte	0x1
+ 748 0263 32       		.byte	0x32
+ 749 0264 68000000 		.4byte	0x68
+ 750 0268 B0000000 		.4byte	.LLST6
+ 751 026c 08       		.uleb128 0x8
+ 752 026d 18000000 		.4byte	.LBB3
+ 753 0271 6A000000 		.4byte	.LBE3-.LBB3
+ 754 0275 09       		.uleb128 0x9
+ 755 0276 6900     		.ascii	"i\000"
+ 756 0278 01       		.byte	0x1
+ 757 0279 34       		.byte	0x34
+ 758 027a 68000000 		.4byte	0x68
+ 759 027e C3000000 		.4byte	.LLST7
+ 760 0282 0A       		.uleb128 0xa
+ 761 0283 22000000 		.4byte	.LVL30
+ 762 0287 A2060000 		.4byte	0x6a2
+ 763 028b 95020000 		.4byte	0x295
+ 764 028f 0B       		.uleb128 0xb
+ 765 0290 01       		.uleb128 0x1
+ 766 0291 50       		.byte	0x50
+ 767 0292 01       		.uleb128 0x1
+ 768 0293 31       		.byte	0x31
+ 769 0294 00       		.byte	0
+ 770 0295 0A       		.uleb128 0xa
+ 771 0296 28000000 		.4byte	.LVL31
+ 772 029a AD060000 		.4byte	0x6ad
+ 773 029e A8020000 		.4byte	0x2a8
+ 774 02a2 0B       		.uleb128 0xb
+ 775 02a3 01       		.uleb128 0x1
+ 776 02a4 50       		.byte	0x50
+ 777 02a5 01       		.uleb128 0x1
+ 778 02a6 31       		.byte	0x31
+ 779 02a7 00       		.byte	0
+ 780 02a8 0A       		.uleb128 0xa
+ 781 02a9 2E000000 		.4byte	.LVL32
+ 782 02ad A2060000 		.4byte	0x6a2
+ 783 02b1 BB020000 		.4byte	0x2bb
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 17
+
+
+ 784 02b5 0B       		.uleb128 0xb
+ 785 02b6 01       		.uleb128 0x1
+ 786 02b7 50       		.byte	0x50
+ 787 02b8 01       		.uleb128 0x1
+ 788 02b9 33       		.byte	0x33
+ 789 02ba 00       		.byte	0
+ 790 02bb 0A       		.uleb128 0xa
+ 791 02bc 34000000 		.4byte	.LVL33
+ 792 02c0 AD060000 		.4byte	0x6ad
+ 793 02c4 CE020000 		.4byte	0x2ce
+ 794 02c8 0B       		.uleb128 0xb
+ 795 02c9 01       		.uleb128 0x1
+ 796 02ca 50       		.byte	0x50
+ 797 02cb 01       		.uleb128 0x1
+ 798 02cc 31       		.byte	0x31
+ 799 02cd 00       		.byte	0
+ 800 02ce 0A       		.uleb128 0xa
+ 801 02cf 3A000000 		.4byte	.LVL34
+ 802 02d3 A2060000 		.4byte	0x6a2
+ 803 02d7 E1020000 		.4byte	0x2e1
+ 804 02db 0B       		.uleb128 0xb
+ 805 02dc 01       		.uleb128 0x1
+ 806 02dd 50       		.byte	0x50
+ 807 02de 01       		.uleb128 0x1
+ 808 02df 32       		.byte	0x32
+ 809 02e0 00       		.byte	0
+ 810 02e1 0A       		.uleb128 0xa
+ 811 02e2 40000000 		.4byte	.LVL35
+ 812 02e6 AD060000 		.4byte	0x6ad
+ 813 02ea F4020000 		.4byte	0x2f4
+ 814 02ee 0B       		.uleb128 0xb
+ 815 02ef 01       		.uleb128 0x1
+ 816 02f0 50       		.byte	0x50
+ 817 02f1 01       		.uleb128 0x1
+ 818 02f2 31       		.byte	0x31
+ 819 02f3 00       		.byte	0
+ 820 02f4 0A       		.uleb128 0xa
+ 821 02f5 46000000 		.4byte	.LVL36
+ 822 02f9 A2060000 		.4byte	0x6a2
+ 823 02fd 07030000 		.4byte	0x307
+ 824 0301 0B       		.uleb128 0xb
+ 825 0302 01       		.uleb128 0x1
+ 826 0303 50       		.byte	0x50
+ 827 0304 01       		.uleb128 0x1
+ 828 0305 36       		.byte	0x36
+ 829 0306 00       		.byte	0
+ 830 0307 0A       		.uleb128 0xa
+ 831 0308 4C000000 		.4byte	.LVL37
+ 832 030c AD060000 		.4byte	0x6ad
+ 833 0310 1A030000 		.4byte	0x31a
+ 834 0314 0B       		.uleb128 0xb
+ 835 0315 01       		.uleb128 0x1
+ 836 0316 50       		.byte	0x50
+ 837 0317 01       		.uleb128 0x1
+ 838 0318 31       		.byte	0x31
+ 839 0319 00       		.byte	0
+ 840 031a 0A       		.uleb128 0xa
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 18
+
+
+ 841 031b 52000000 		.4byte	.LVL38
+ 842 031f A2060000 		.4byte	0x6a2
+ 843 0323 2D030000 		.4byte	0x32d
+ 844 0327 0B       		.uleb128 0xb
+ 845 0328 01       		.uleb128 0x1
+ 846 0329 50       		.byte	0x50
+ 847 032a 01       		.uleb128 0x1
+ 848 032b 34       		.byte	0x34
+ 849 032c 00       		.byte	0
+ 850 032d 0A       		.uleb128 0xa
+ 851 032e 58000000 		.4byte	.LVL39
+ 852 0332 AD060000 		.4byte	0x6ad
+ 853 0336 40030000 		.4byte	0x340
+ 854 033a 0B       		.uleb128 0xb
+ 855 033b 01       		.uleb128 0x1
+ 856 033c 50       		.byte	0x50
+ 857 033d 01       		.uleb128 0x1
+ 858 033e 31       		.byte	0x31
+ 859 033f 00       		.byte	0
+ 860 0340 0A       		.uleb128 0xa
+ 861 0341 5E000000 		.4byte	.LVL40
+ 862 0345 A2060000 		.4byte	0x6a2
+ 863 0349 53030000 		.4byte	0x353
+ 864 034d 0B       		.uleb128 0xb
+ 865 034e 01       		.uleb128 0x1
+ 866 034f 50       		.byte	0x50
+ 867 0350 01       		.uleb128 0x1
+ 868 0351 3C       		.byte	0x3c
+ 869 0352 00       		.byte	0
+ 870 0353 0A       		.uleb128 0xa
+ 871 0354 64000000 		.4byte	.LVL41
+ 872 0358 AD060000 		.4byte	0x6ad
+ 873 035c 66030000 		.4byte	0x366
+ 874 0360 0B       		.uleb128 0xb
+ 875 0361 01       		.uleb128 0x1
+ 876 0362 50       		.byte	0x50
+ 877 0363 01       		.uleb128 0x1
+ 878 0364 31       		.byte	0x31
+ 879 0365 00       		.byte	0
+ 880 0366 0A       		.uleb128 0xa
+ 881 0367 6A000000 		.4byte	.LVL42
+ 882 036b A2060000 		.4byte	0x6a2
+ 883 036f 79030000 		.4byte	0x379
+ 884 0373 0B       		.uleb128 0xb
+ 885 0374 01       		.uleb128 0x1
+ 886 0375 50       		.byte	0x50
+ 887 0376 01       		.uleb128 0x1
+ 888 0377 38       		.byte	0x38
+ 889 0378 00       		.byte	0
+ 890 0379 0A       		.uleb128 0xa
+ 891 037a 70000000 		.4byte	.LVL43
+ 892 037e AD060000 		.4byte	0x6ad
+ 893 0382 8C030000 		.4byte	0x38c
+ 894 0386 0B       		.uleb128 0xb
+ 895 0387 01       		.uleb128 0x1
+ 896 0388 50       		.byte	0x50
+ 897 0389 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 19
+
+
+ 898 038a 31       		.byte	0x31
+ 899 038b 00       		.byte	0
+ 900 038c 0A       		.uleb128 0xa
+ 901 038d 76000000 		.4byte	.LVL44
+ 902 0391 A2060000 		.4byte	0x6a2
+ 903 0395 9F030000 		.4byte	0x39f
+ 904 0399 0B       		.uleb128 0xb
+ 905 039a 01       		.uleb128 0x1
+ 906 039b 50       		.byte	0x50
+ 907 039c 01       		.uleb128 0x1
+ 908 039d 39       		.byte	0x39
+ 909 039e 00       		.byte	0
+ 910 039f 0C       		.uleb128 0xc
+ 911 03a0 7C000000 		.4byte	.LVL45
+ 912 03a4 AD060000 		.4byte	0x6ad
+ 913 03a8 0B       		.uleb128 0xb
+ 914 03a9 01       		.uleb128 0x1
+ 915 03aa 50       		.byte	0x50
+ 916 03ab 01       		.uleb128 0x1
+ 917 03ac 31       		.byte	0x31
+ 918 03ad 00       		.byte	0
+ 919 03ae 00       		.byte	0
+ 920 03af 00       		.byte	0
+ 921 03b0 0D       		.uleb128 0xd
+ 922 03b1 26010000 		.4byte	.LASF32
+ 923 03b5 01       		.byte	0x1
+ 924 03b6 4D       		.byte	0x4d
+ 925 03b7 68000000 		.4byte	0x68
+ 926 03bb 00000000 		.4byte	.LFB66
+ 927 03bf 10010000 		.4byte	.LFE66-.LFB66
+ 928 03c3 01       		.uleb128 0x1
+ 929 03c4 9C       		.byte	0x9c
+ 930 03c5 91060000 		.4byte	0x691
+ 931 03c9 0E       		.uleb128 0xe
+ 932 03ca 08000000 		.4byte	.LVL48
+ 933 03ce B8060000 		.4byte	0x6b8
+ 934 03d2 0E       		.uleb128 0xe
+ 935 03d3 0C000000 		.4byte	.LVL49
+ 936 03d7 C3060000 		.4byte	0x6c3
+ 937 03db 0E       		.uleb128 0xe
+ 938 03dc 10000000 		.4byte	.LVL50
+ 939 03e0 CE060000 		.4byte	0x6ce
+ 940 03e4 0A       		.uleb128 0xa
+ 941 03e5 16000000 		.4byte	.LVL51
+ 942 03e9 2A020000 		.4byte	0x22a
+ 943 03ed F8030000 		.4byte	0x3f8
+ 944 03f1 0B       		.uleb128 0xb
+ 945 03f2 01       		.uleb128 0x1
+ 946 03f3 50       		.byte	0x50
+ 947 03f4 02       		.uleb128 0x2
+ 948 03f5 08       		.byte	0x8
+ 949 03f6 64       		.byte	0x64
+ 950 03f7 00       		.byte	0
+ 951 03f8 0A       		.uleb128 0xa
+ 952 03f9 1E000000 		.4byte	.LVL52
+ 953 03fd D9060000 		.4byte	0x6d9
+ 954 0401 0D040000 		.4byte	0x40d
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 20
+
+
+ 955 0405 0B       		.uleb128 0xb
+ 956 0406 01       		.uleb128 0x1
+ 957 0407 50       		.byte	0x50
+ 958 0408 03       		.uleb128 0x3
+ 959 0409 0A       		.byte	0xa
+ 960 040a D007     		.2byte	0x7d0
+ 961 040c 00       		.byte	0
+ 962 040d 0A       		.uleb128 0xa
+ 963 040e 26000000 		.4byte	.LVL53
+ 964 0412 AD060000 		.4byte	0x6ad
+ 965 0416 22040000 		.4byte	0x422
+ 966 041a 0B       		.uleb128 0xb
+ 967 041b 01       		.uleb128 0x1
+ 968 041c 50       		.byte	0x50
+ 969 041d 03       		.uleb128 0x3
+ 970 041e 0A       		.byte	0xa
+ 971 041f C201     		.2byte	0x1c2
+ 972 0421 00       		.byte	0
+ 973 0422 0A       		.uleb128 0xa
+ 974 0423 2E000000 		.4byte	.LVL54
+ 975 0427 E4060000 		.4byte	0x6e4
+ 976 042b 37040000 		.4byte	0x437
+ 977 042f 0B       		.uleb128 0xb
+ 978 0430 01       		.uleb128 0x1
+ 979 0431 50       		.byte	0x50
+ 980 0432 03       		.uleb128 0x3
+ 981 0433 0A       		.byte	0xa
+ 982 0434 B80B     		.2byte	0xbb8
+ 983 0436 00       		.byte	0
+ 984 0437 0A       		.uleb128 0xa
+ 985 0438 36000000 		.4byte	.LVL55
+ 986 043c AD060000 		.4byte	0x6ad
+ 987 0440 4C040000 		.4byte	0x44c
+ 988 0444 0B       		.uleb128 0xb
+ 989 0445 01       		.uleb128 0x1
+ 990 0446 50       		.byte	0x50
+ 991 0447 03       		.uleb128 0x3
+ 992 0448 0A       		.byte	0xa
+ 993 0449 C201     		.2byte	0x1c2
+ 994 044b 00       		.byte	0
+ 995 044c 0A       		.uleb128 0xa
+ 996 044d 3E000000 		.4byte	.LVL56
+ 997 0451 D9060000 		.4byte	0x6d9
+ 998 0455 61040000 		.4byte	0x461
+ 999 0459 0B       		.uleb128 0xb
+ 1000 045a 01       		.uleb128 0x1
+ 1001 045b 50       		.byte	0x50
+ 1002 045c 03       		.uleb128 0x3
+ 1003 045d 0A       		.byte	0xa
+ 1004 045e 9808     		.2byte	0x898
+ 1005 0460 00       		.byte	0
+ 1006 0461 0A       		.uleb128 0xa
+ 1007 0462 46000000 		.4byte	.LVL57
+ 1008 0466 AD060000 		.4byte	0x6ad
+ 1009 046a 76040000 		.4byte	0x476
+ 1010 046e 0B       		.uleb128 0xb
+ 1011 046f 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 21
+
+
+ 1012 0470 50       		.byte	0x50
+ 1013 0471 03       		.uleb128 0x3
+ 1014 0472 0A       		.byte	0xa
+ 1015 0473 C201     		.2byte	0x1c2
+ 1016 0475 00       		.byte	0
+ 1017 0476 0A       		.uleb128 0xa
+ 1018 0477 4E000000 		.4byte	.LVL58
+ 1019 047b E4060000 		.4byte	0x6e4
+ 1020 047f 8B040000 		.4byte	0x48b
+ 1021 0483 0B       		.uleb128 0xb
+ 1022 0484 01       		.uleb128 0x1
+ 1023 0485 50       		.byte	0x50
+ 1024 0486 03       		.uleb128 0x3
+ 1025 0487 0A       		.byte	0xa
+ 1026 0488 F00A     		.2byte	0xaf0
+ 1027 048a 00       		.byte	0
+ 1028 048b 0A       		.uleb128 0xa
+ 1029 048c 56000000 		.4byte	.LVL59
+ 1030 0490 AD060000 		.4byte	0x6ad
+ 1031 0494 A0040000 		.4byte	0x4a0
+ 1032 0498 0B       		.uleb128 0xb
+ 1033 0499 01       		.uleb128 0x1
+ 1034 049a 50       		.byte	0x50
+ 1035 049b 03       		.uleb128 0x3
+ 1036 049c 0A       		.byte	0xa
+ 1037 049d C201     		.2byte	0x1c2
+ 1038 049f 00       		.byte	0
+ 1039 04a0 0A       		.uleb128 0xa
+ 1040 04a1 5C000000 		.4byte	.LVL60
+ 1041 04a5 A4000000 		.4byte	0xa4
+ 1042 04a9 B4040000 		.4byte	0x4b4
+ 1043 04ad 0B       		.uleb128 0xb
+ 1044 04ae 01       		.uleb128 0x1
+ 1045 04af 50       		.byte	0x50
+ 1046 04b0 02       		.uleb128 0x2
+ 1047 04b1 08       		.byte	0x8
+ 1048 04b2 32       		.byte	0x32
+ 1049 04b3 00       		.byte	0
+ 1050 04b4 0A       		.uleb128 0xa
+ 1051 04b5 64000000 		.4byte	.LVL61
+ 1052 04b9 D9060000 		.4byte	0x6d9
+ 1053 04bd C9040000 		.4byte	0x4c9
+ 1054 04c1 0B       		.uleb128 0xb
+ 1055 04c2 01       		.uleb128 0x1
+ 1056 04c3 50       		.byte	0x50
+ 1057 04c4 03       		.uleb128 0x3
+ 1058 04c5 0A       		.byte	0xa
+ 1059 04c6 6009     		.2byte	0x960
+ 1060 04c8 00       		.byte	0
+ 1061 04c9 0A       		.uleb128 0xa
+ 1062 04ca 6C000000 		.4byte	.LVL62
+ 1063 04ce AD060000 		.4byte	0x6ad
+ 1064 04d2 DE040000 		.4byte	0x4de
+ 1065 04d6 0B       		.uleb128 0xb
+ 1066 04d7 01       		.uleb128 0x1
+ 1067 04d8 50       		.byte	0x50
+ 1068 04d9 03       		.uleb128 0x3
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 22
+
+
+ 1069 04da 0A       		.byte	0xa
+ 1070 04db C201     		.2byte	0x1c2
+ 1071 04dd 00       		.byte	0
+ 1072 04de 0A       		.uleb128 0xa
+ 1073 04df 74000000 		.4byte	.LVL63
+ 1074 04e3 E4060000 		.4byte	0x6e4
+ 1075 04e7 F3040000 		.4byte	0x4f3
+ 1076 04eb 0B       		.uleb128 0xb
+ 1077 04ec 01       		.uleb128 0x1
+ 1078 04ed 50       		.byte	0x50
+ 1079 04ee 03       		.uleb128 0x3
+ 1080 04ef 0A       		.byte	0xa
+ 1081 04f0 280A     		.2byte	0xa28
+ 1082 04f2 00       		.byte	0
+ 1083 04f3 0A       		.uleb128 0xa
+ 1084 04f4 7C000000 		.4byte	.LVL64
+ 1085 04f8 AD060000 		.4byte	0x6ad
+ 1086 04fc 08050000 		.4byte	0x508
+ 1087 0500 0B       		.uleb128 0xb
+ 1088 0501 01       		.uleb128 0x1
+ 1089 0502 50       		.byte	0x50
+ 1090 0503 03       		.uleb128 0x3
+ 1091 0504 0A       		.byte	0xa
+ 1092 0505 C201     		.2byte	0x1c2
+ 1093 0507 00       		.byte	0
+ 1094 0508 0A       		.uleb128 0xa
+ 1095 0509 84000000 		.4byte	.LVL65
+ 1096 050d D9060000 		.4byte	0x6d9
+ 1097 0511 1D050000 		.4byte	0x51d
+ 1098 0515 0B       		.uleb128 0xb
+ 1099 0516 01       		.uleb128 0x1
+ 1100 0517 50       		.byte	0x50
+ 1101 0518 03       		.uleb128 0x3
+ 1102 0519 0A       		.byte	0xa
+ 1103 051a 280A     		.2byte	0xa28
+ 1104 051c 00       		.byte	0
+ 1105 051d 0A       		.uleb128 0xa
+ 1106 051e 8C000000 		.4byte	.LVL66
+ 1107 0522 AD060000 		.4byte	0x6ad
+ 1108 0526 32050000 		.4byte	0x532
+ 1109 052a 0B       		.uleb128 0xb
+ 1110 052b 01       		.uleb128 0x1
+ 1111 052c 50       		.byte	0x50
+ 1112 052d 03       		.uleb128 0x3
+ 1113 052e 0A       		.byte	0xa
+ 1114 052f C201     		.2byte	0x1c2
+ 1115 0531 00       		.byte	0
+ 1116 0532 0A       		.uleb128 0xa
+ 1117 0533 94000000 		.4byte	.LVL67
+ 1118 0537 E4060000 		.4byte	0x6e4
+ 1119 053b 47050000 		.4byte	0x547
+ 1120 053f 0B       		.uleb128 0xb
+ 1121 0540 01       		.uleb128 0x1
+ 1122 0541 50       		.byte	0x50
+ 1123 0542 03       		.uleb128 0x3
+ 1124 0543 0A       		.byte	0xa
+ 1125 0544 6009     		.2byte	0x960
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 23
+
+
+ 1126 0546 00       		.byte	0
+ 1127 0547 0A       		.uleb128 0xa
+ 1128 0548 9C000000 		.4byte	.LVL68
+ 1129 054c AD060000 		.4byte	0x6ad
+ 1130 0550 5C050000 		.4byte	0x55c
+ 1131 0554 0B       		.uleb128 0xb
+ 1132 0555 01       		.uleb128 0x1
+ 1133 0556 50       		.byte	0x50
+ 1134 0557 03       		.uleb128 0x3
+ 1135 0558 0A       		.byte	0xa
+ 1136 0559 C201     		.2byte	0x1c2
+ 1137 055b 00       		.byte	0
+ 1138 055c 0A       		.uleb128 0xa
+ 1139 055d A2000000 		.4byte	.LVL69
+ 1140 0561 2A020000 		.4byte	0x22a
+ 1141 0565 70050000 		.4byte	0x570
+ 1142 0569 0B       		.uleb128 0xb
+ 1143 056a 01       		.uleb128 0x1
+ 1144 056b 50       		.byte	0x50
+ 1145 056c 02       		.uleb128 0x2
+ 1146 056d 08       		.byte	0x8
+ 1147 056e 32       		.byte	0x32
+ 1148 056f 00       		.byte	0
+ 1149 0570 0A       		.uleb128 0xa
+ 1150 0571 AA000000 		.4byte	.LVL70
+ 1151 0575 D9060000 		.4byte	0x6d9
+ 1152 0579 85050000 		.4byte	0x585
+ 1153 057d 0B       		.uleb128 0xb
+ 1154 057e 01       		.uleb128 0x1
+ 1155 057f 50       		.byte	0x50
+ 1156 0580 03       		.uleb128 0x3
+ 1157 0581 0A       		.byte	0xa
+ 1158 0582 F00A     		.2byte	0xaf0
+ 1159 0584 00       		.byte	0
+ 1160 0585 0A       		.uleb128 0xa
+ 1161 0586 B2000000 		.4byte	.LVL71
+ 1162 058a AD060000 		.4byte	0x6ad
+ 1163 058e 9A050000 		.4byte	0x59a
+ 1164 0592 0B       		.uleb128 0xb
+ 1165 0593 01       		.uleb128 0x1
+ 1166 0594 50       		.byte	0x50
+ 1167 0595 03       		.uleb128 0x3
+ 1168 0596 0A       		.byte	0xa
+ 1169 0597 C201     		.2byte	0x1c2
+ 1170 0599 00       		.byte	0
+ 1171 059a 0A       		.uleb128 0xa
+ 1172 059b BA000000 		.4byte	.LVL72
+ 1173 059f E4060000 		.4byte	0x6e4
+ 1174 05a3 AF050000 		.4byte	0x5af
+ 1175 05a7 0B       		.uleb128 0xb
+ 1176 05a8 01       		.uleb128 0x1
+ 1177 05a9 50       		.byte	0x50
+ 1178 05aa 03       		.uleb128 0x3
+ 1179 05ab 0A       		.byte	0xa
+ 1180 05ac 9808     		.2byte	0x898
+ 1181 05ae 00       		.byte	0
+ 1182 05af 0A       		.uleb128 0xa
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 24
+
+
+ 1183 05b0 C2000000 		.4byte	.LVL73
+ 1184 05b4 AD060000 		.4byte	0x6ad
+ 1185 05b8 C4050000 		.4byte	0x5c4
+ 1186 05bc 0B       		.uleb128 0xb
+ 1187 05bd 01       		.uleb128 0x1
+ 1188 05be 50       		.byte	0x50
+ 1189 05bf 03       		.uleb128 0x3
+ 1190 05c0 0A       		.byte	0xa
+ 1191 05c1 C201     		.2byte	0x1c2
+ 1192 05c3 00       		.byte	0
+ 1193 05c4 0A       		.uleb128 0xa
+ 1194 05c5 CA000000 		.4byte	.LVL74
+ 1195 05c9 D9060000 		.4byte	0x6d9
+ 1196 05cd D9050000 		.4byte	0x5d9
+ 1197 05d1 0B       		.uleb128 0xb
+ 1198 05d2 01       		.uleb128 0x1
+ 1199 05d3 50       		.byte	0x50
+ 1200 05d4 03       		.uleb128 0x3
+ 1201 05d5 0A       		.byte	0xa
+ 1202 05d6 B80B     		.2byte	0xbb8
+ 1203 05d8 00       		.byte	0
+ 1204 05d9 0A       		.uleb128 0xa
+ 1205 05da D2000000 		.4byte	.LVL75
+ 1206 05de AD060000 		.4byte	0x6ad
+ 1207 05e2 EE050000 		.4byte	0x5ee
+ 1208 05e6 0B       		.uleb128 0xb
+ 1209 05e7 01       		.uleb128 0x1
+ 1210 05e8 50       		.byte	0x50
+ 1211 05e9 03       		.uleb128 0x3
+ 1212 05ea 0A       		.byte	0xa
+ 1213 05eb C201     		.2byte	0x1c2
+ 1214 05ed 00       		.byte	0
+ 1215 05ee 0A       		.uleb128 0xa
+ 1216 05ef DA000000 		.4byte	.LVL76
+ 1217 05f3 E4060000 		.4byte	0x6e4
+ 1218 05f7 03060000 		.4byte	0x603
+ 1219 05fb 0B       		.uleb128 0xb
+ 1220 05fc 01       		.uleb128 0x1
+ 1221 05fd 50       		.byte	0x50
+ 1222 05fe 03       		.uleb128 0x3
+ 1223 05ff 0A       		.byte	0xa
+ 1224 0600 D007     		.2byte	0x7d0
+ 1225 0602 00       		.byte	0
+ 1226 0603 0A       		.uleb128 0xa
+ 1227 0604 E2000000 		.4byte	.LVL77
+ 1228 0608 AD060000 		.4byte	0x6ad
+ 1229 060c 18060000 		.4byte	0x618
+ 1230 0610 0B       		.uleb128 0xb
+ 1231 0611 01       		.uleb128 0x1
+ 1232 0612 50       		.byte	0x50
+ 1233 0613 03       		.uleb128 0x3
+ 1234 0614 0A       		.byte	0xa
+ 1235 0615 C201     		.2byte	0x1c2
+ 1236 0617 00       		.byte	0
+ 1237 0618 0A       		.uleb128 0xa
+ 1238 0619 EA000000 		.4byte	.LVL78
+ 1239 061d EF060000 		.4byte	0x6ef
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 25
+
+
+ 1240 0621 2D060000 		.4byte	0x62d
+ 1241 0625 0B       		.uleb128 0xb
+ 1242 0626 01       		.uleb128 0x1
+ 1243 0627 50       		.byte	0x50
+ 1244 0628 03       		.uleb128 0x3
+ 1245 0629 0A       		.byte	0xa
+ 1246 062a E803     		.2byte	0x3e8
+ 1247 062c 00       		.byte	0
+ 1248 062d 0A       		.uleb128 0xa
+ 1249 062e F2000000 		.4byte	.LVL79
+ 1250 0632 AD060000 		.4byte	0x6ad
+ 1251 0636 42060000 		.4byte	0x642
+ 1252 063a 0B       		.uleb128 0xb
+ 1253 063b 01       		.uleb128 0x1
+ 1254 063c 50       		.byte	0x50
+ 1255 063d 03       		.uleb128 0x3
+ 1256 063e 0A       		.byte	0xa
+ 1257 063f C201     		.2byte	0x1c2
+ 1258 0641 00       		.byte	0
+ 1259 0642 0A       		.uleb128 0xa
+ 1260 0643 FA000000 		.4byte	.LVL80
+ 1261 0647 EF060000 		.4byte	0x6ef
+ 1262 064b 57060000 		.4byte	0x657
+ 1263 064f 0B       		.uleb128 0xb
+ 1264 0650 01       		.uleb128 0x1
+ 1265 0651 50       		.byte	0x50
+ 1266 0652 03       		.uleb128 0x3
+ 1267 0653 0A       		.byte	0xa
+ 1268 0654 A00F     		.2byte	0xfa0
+ 1269 0656 00       		.byte	0
+ 1270 0657 0A       		.uleb128 0xa
+ 1271 0658 02010000 		.4byte	.LVL81
+ 1272 065c AD060000 		.4byte	0x6ad
+ 1273 0660 6C060000 		.4byte	0x66c
+ 1274 0664 0B       		.uleb128 0xb
+ 1275 0665 01       		.uleb128 0x1
+ 1276 0666 50       		.byte	0x50
+ 1277 0667 03       		.uleb128 0x3
+ 1278 0668 0A       		.byte	0xa
+ 1279 0669 C201     		.2byte	0x1c2
+ 1280 066b 00       		.byte	0
+ 1281 066c 0A       		.uleb128 0xa
+ 1282 066d 08010000 		.4byte	.LVL82
+ 1283 0671 A4000000 		.4byte	0xa4
+ 1284 0675 80060000 		.4byte	0x680
+ 1285 0679 0B       		.uleb128 0xb
+ 1286 067a 01       		.uleb128 0x1
+ 1287 067b 50       		.byte	0x50
+ 1288 067c 02       		.uleb128 0x2
+ 1289 067d 08       		.byte	0x8
+ 1290 067e 64       		.byte	0x64
+ 1291 067f 00       		.byte	0
+ 1292 0680 0C       		.uleb128 0xc
+ 1293 0681 0E010000 		.4byte	.LVL83
+ 1294 0685 AD060000 		.4byte	0x6ad
+ 1295 0689 0B       		.uleb128 0xb
+ 1296 068a 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 26
+
+
+ 1297 068b 50       		.byte	0x50
+ 1298 068c 02       		.uleb128 0x2
+ 1299 068d 08       		.byte	0x8
+ 1300 068e C8       		.byte	0xc8
+ 1301 068f 00       		.byte	0
+ 1302 0690 00       		.byte	0
+ 1303 0691 0F       		.uleb128 0xf
+ 1304 0692 FE000000 		.4byte	.LASF33
+ 1305 0696 09       		.byte	0x9
+ 1306 0697 1207     		.2byte	0x712
+ 1307 0699 9D060000 		.4byte	0x69d
+ 1308 069d 10       		.uleb128 0x10
+ 1309 069e 76000000 		.4byte	0x76
+ 1310 06a2 11       		.uleb128 0x11
+ 1311 06a3 AC010000 		.4byte	.LASF21
+ 1312 06a7 AC010000 		.4byte	.LASF21
+ 1313 06ab 04       		.byte	0x4
+ 1314 06ac 26       		.byte	0x26
+ 1315 06ad 11       		.uleb128 0x11
+ 1316 06ae 44020000 		.4byte	.LASF22
+ 1317 06b2 44020000 		.4byte	.LASF22
+ 1318 06b6 05       		.byte	0x5
+ 1319 06b7 76       		.byte	0x76
+ 1320 06b8 11       		.uleb128 0x11
+ 1321 06b9 F2000000 		.4byte	.LASF23
+ 1322 06bd F2000000 		.4byte	.LASF23
+ 1323 06c1 06       		.byte	0x6
+ 1324 06c2 92       		.byte	0x92
+ 1325 06c3 11       		.uleb128 0x11
+ 1326 06c4 1A010000 		.4byte	.LASF24
+ 1327 06c8 1A010000 		.4byte	.LASF24
+ 1328 06cc 07       		.byte	0x7
+ 1329 06cd 92       		.byte	0x92
+ 1330 06ce 11       		.uleb128 0x11
+ 1331 06cf 2B010000 		.4byte	.LASF25
+ 1332 06d3 2B010000 		.4byte	.LASF25
+ 1333 06d7 08       		.byte	0x8
+ 1334 06d8 92       		.byte	0x92
+ 1335 06d9 11       		.uleb128 0x11
+ 1336 06da 1D000000 		.4byte	.LASF26
+ 1337 06de 1D000000 		.4byte	.LASF26
+ 1338 06e2 07       		.byte	0x7
+ 1339 06e3 C3       		.byte	0xc3
+ 1340 06e4 11       		.uleb128 0x11
+ 1341 06e5 79010000 		.4byte	.LASF27
+ 1342 06e9 79010000 		.4byte	.LASF27
+ 1343 06ed 06       		.byte	0x6
+ 1344 06ee C3       		.byte	0xc3
+ 1345 06ef 11       		.uleb128 0x11
+ 1346 06f0 25020000 		.4byte	.LASF28
+ 1347 06f4 25020000 		.4byte	.LASF28
+ 1348 06f8 08       		.byte	0x8
+ 1349 06f9 C3       		.byte	0xc3
+ 1350 06fa 00       		.byte	0
+ 1351              		.section	.debug_abbrev,"",%progbits
+ 1352              	.Ldebug_abbrev0:
+ 1353 0000 01       		.uleb128 0x1
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 27
+
+
+ 1354 0001 11       		.uleb128 0x11
+ 1355 0002 01       		.byte	0x1
+ 1356 0003 25       		.uleb128 0x25
+ 1357 0004 0E       		.uleb128 0xe
+ 1358 0005 13       		.uleb128 0x13
+ 1359 0006 0B       		.uleb128 0xb
+ 1360 0007 03       		.uleb128 0x3
+ 1361 0008 0E       		.uleb128 0xe
+ 1362 0009 1B       		.uleb128 0x1b
+ 1363 000a 0E       		.uleb128 0xe
+ 1364 000b 55       		.uleb128 0x55
+ 1365 000c 17       		.uleb128 0x17
+ 1366 000d 11       		.uleb128 0x11
+ 1367 000e 01       		.uleb128 0x1
+ 1368 000f 10       		.uleb128 0x10
+ 1369 0010 17       		.uleb128 0x17
+ 1370 0011 00       		.byte	0
+ 1371 0012 00       		.byte	0
+ 1372 0013 02       		.uleb128 0x2
+ 1373 0014 24       		.uleb128 0x24
+ 1374 0015 00       		.byte	0
+ 1375 0016 0B       		.uleb128 0xb
+ 1376 0017 0B       		.uleb128 0xb
+ 1377 0018 3E       		.uleb128 0x3e
+ 1378 0019 0B       		.uleb128 0xb
+ 1379 001a 03       		.uleb128 0x3
+ 1380 001b 0E       		.uleb128 0xe
+ 1381 001c 00       		.byte	0
+ 1382 001d 00       		.byte	0
+ 1383 001e 03       		.uleb128 0x3
+ 1384 001f 16       		.uleb128 0x16
+ 1385 0020 00       		.byte	0
+ 1386 0021 03       		.uleb128 0x3
+ 1387 0022 0E       		.uleb128 0xe
+ 1388 0023 3A       		.uleb128 0x3a
+ 1389 0024 0B       		.uleb128 0xb
+ 1390 0025 3B       		.uleb128 0x3b
+ 1391 0026 0B       		.uleb128 0xb
+ 1392 0027 49       		.uleb128 0x49
+ 1393 0028 13       		.uleb128 0x13
+ 1394 0029 00       		.byte	0
+ 1395 002a 00       		.byte	0
+ 1396 002b 04       		.uleb128 0x4
+ 1397 002c 24       		.uleb128 0x24
+ 1398 002d 00       		.byte	0
+ 1399 002e 0B       		.uleb128 0xb
+ 1400 002f 0B       		.uleb128 0xb
+ 1401 0030 3E       		.uleb128 0x3e
+ 1402 0031 0B       		.uleb128 0xb
+ 1403 0032 03       		.uleb128 0x3
+ 1404 0033 08       		.uleb128 0x8
+ 1405 0034 00       		.byte	0
+ 1406 0035 00       		.byte	0
+ 1407 0036 05       		.uleb128 0x5
+ 1408 0037 2E       		.uleb128 0x2e
+ 1409 0038 01       		.byte	0x1
+ 1410 0039 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 28
+
+
+ 1411 003a 19       		.uleb128 0x19
+ 1412 003b 03       		.uleb128 0x3
+ 1413 003c 0E       		.uleb128 0xe
+ 1414 003d 3A       		.uleb128 0x3a
+ 1415 003e 0B       		.uleb128 0xb
+ 1416 003f 3B       		.uleb128 0x3b
+ 1417 0040 0B       		.uleb128 0xb
+ 1418 0041 27       		.uleb128 0x27
+ 1419 0042 19       		.uleb128 0x19
+ 1420 0043 11       		.uleb128 0x11
+ 1421 0044 01       		.uleb128 0x1
+ 1422 0045 12       		.uleb128 0x12
+ 1423 0046 06       		.uleb128 0x6
+ 1424 0047 40       		.uleb128 0x40
+ 1425 0048 18       		.uleb128 0x18
+ 1426 0049 9642     		.uleb128 0x2116
+ 1427 004b 19       		.uleb128 0x19
+ 1428 004c 01       		.uleb128 0x1
+ 1429 004d 13       		.uleb128 0x13
+ 1430 004e 00       		.byte	0
+ 1431 004f 00       		.byte	0
+ 1432 0050 06       		.uleb128 0x6
+ 1433 0051 05       		.uleb128 0x5
+ 1434 0052 00       		.byte	0
+ 1435 0053 03       		.uleb128 0x3
+ 1436 0054 0E       		.uleb128 0xe
+ 1437 0055 3A       		.uleb128 0x3a
+ 1438 0056 0B       		.uleb128 0xb
+ 1439 0057 3B       		.uleb128 0x3b
+ 1440 0058 0B       		.uleb128 0xb
+ 1441 0059 49       		.uleb128 0x49
+ 1442 005a 13       		.uleb128 0x13
+ 1443 005b 02       		.uleb128 0x2
+ 1444 005c 17       		.uleb128 0x17
+ 1445 005d 00       		.byte	0
+ 1446 005e 00       		.byte	0
+ 1447 005f 07       		.uleb128 0x7
+ 1448 0060 34       		.uleb128 0x34
+ 1449 0061 00       		.byte	0
+ 1450 0062 03       		.uleb128 0x3
+ 1451 0063 0E       		.uleb128 0xe
+ 1452 0064 3A       		.uleb128 0x3a
+ 1453 0065 0B       		.uleb128 0xb
+ 1454 0066 3B       		.uleb128 0x3b
+ 1455 0067 0B       		.uleb128 0xb
+ 1456 0068 49       		.uleb128 0x49
+ 1457 0069 13       		.uleb128 0x13
+ 1458 006a 02       		.uleb128 0x2
+ 1459 006b 17       		.uleb128 0x17
+ 1460 006c 00       		.byte	0
+ 1461 006d 00       		.byte	0
+ 1462 006e 08       		.uleb128 0x8
+ 1463 006f 0B       		.uleb128 0xb
+ 1464 0070 01       		.byte	0x1
+ 1465 0071 11       		.uleb128 0x11
+ 1466 0072 01       		.uleb128 0x1
+ 1467 0073 12       		.uleb128 0x12
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 29
+
+
+ 1468 0074 06       		.uleb128 0x6
+ 1469 0075 00       		.byte	0
+ 1470 0076 00       		.byte	0
+ 1471 0077 09       		.uleb128 0x9
+ 1472 0078 34       		.uleb128 0x34
+ 1473 0079 00       		.byte	0
+ 1474 007a 03       		.uleb128 0x3
+ 1475 007b 08       		.uleb128 0x8
+ 1476 007c 3A       		.uleb128 0x3a
+ 1477 007d 0B       		.uleb128 0xb
+ 1478 007e 3B       		.uleb128 0x3b
+ 1479 007f 0B       		.uleb128 0xb
+ 1480 0080 49       		.uleb128 0x49
+ 1481 0081 13       		.uleb128 0x13
+ 1482 0082 02       		.uleb128 0x2
+ 1483 0083 17       		.uleb128 0x17
+ 1484 0084 00       		.byte	0
+ 1485 0085 00       		.byte	0
+ 1486 0086 0A       		.uleb128 0xa
+ 1487 0087 898201   		.uleb128 0x4109
+ 1488 008a 01       		.byte	0x1
+ 1489 008b 11       		.uleb128 0x11
+ 1490 008c 01       		.uleb128 0x1
+ 1491 008d 31       		.uleb128 0x31
+ 1492 008e 13       		.uleb128 0x13
+ 1493 008f 01       		.uleb128 0x1
+ 1494 0090 13       		.uleb128 0x13
+ 1495 0091 00       		.byte	0
+ 1496 0092 00       		.byte	0
+ 1497 0093 0B       		.uleb128 0xb
+ 1498 0094 8A8201   		.uleb128 0x410a
+ 1499 0097 00       		.byte	0
+ 1500 0098 02       		.uleb128 0x2
+ 1501 0099 18       		.uleb128 0x18
+ 1502 009a 9142     		.uleb128 0x2111
+ 1503 009c 18       		.uleb128 0x18
+ 1504 009d 00       		.byte	0
+ 1505 009e 00       		.byte	0
+ 1506 009f 0C       		.uleb128 0xc
+ 1507 00a0 898201   		.uleb128 0x4109
+ 1508 00a3 01       		.byte	0x1
+ 1509 00a4 11       		.uleb128 0x11
+ 1510 00a5 01       		.uleb128 0x1
+ 1511 00a6 31       		.uleb128 0x31
+ 1512 00a7 13       		.uleb128 0x13
+ 1513 00a8 00       		.byte	0
+ 1514 00a9 00       		.byte	0
+ 1515 00aa 0D       		.uleb128 0xd
+ 1516 00ab 2E       		.uleb128 0x2e
+ 1517 00ac 01       		.byte	0x1
+ 1518 00ad 3F       		.uleb128 0x3f
+ 1519 00ae 19       		.uleb128 0x19
+ 1520 00af 03       		.uleb128 0x3
+ 1521 00b0 0E       		.uleb128 0xe
+ 1522 00b1 3A       		.uleb128 0x3a
+ 1523 00b2 0B       		.uleb128 0xb
+ 1524 00b3 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 30
+
+
+ 1525 00b4 0B       		.uleb128 0xb
+ 1526 00b5 27       		.uleb128 0x27
+ 1527 00b6 19       		.uleb128 0x19
+ 1528 00b7 49       		.uleb128 0x49
+ 1529 00b8 13       		.uleb128 0x13
+ 1530 00b9 8701     		.uleb128 0x87
+ 1531 00bb 19       		.uleb128 0x19
+ 1532 00bc 11       		.uleb128 0x11
+ 1533 00bd 01       		.uleb128 0x1
+ 1534 00be 12       		.uleb128 0x12
+ 1535 00bf 06       		.uleb128 0x6
+ 1536 00c0 40       		.uleb128 0x40
+ 1537 00c1 18       		.uleb128 0x18
+ 1538 00c2 9742     		.uleb128 0x2117
+ 1539 00c4 19       		.uleb128 0x19
+ 1540 00c5 01       		.uleb128 0x1
+ 1541 00c6 13       		.uleb128 0x13
+ 1542 00c7 00       		.byte	0
+ 1543 00c8 00       		.byte	0
+ 1544 00c9 0E       		.uleb128 0xe
+ 1545 00ca 898201   		.uleb128 0x4109
+ 1546 00cd 00       		.byte	0
+ 1547 00ce 11       		.uleb128 0x11
+ 1548 00cf 01       		.uleb128 0x1
+ 1549 00d0 31       		.uleb128 0x31
+ 1550 00d1 13       		.uleb128 0x13
+ 1551 00d2 00       		.byte	0
+ 1552 00d3 00       		.byte	0
+ 1553 00d4 0F       		.uleb128 0xf
+ 1554 00d5 34       		.uleb128 0x34
+ 1555 00d6 00       		.byte	0
+ 1556 00d7 03       		.uleb128 0x3
+ 1557 00d8 0E       		.uleb128 0xe
+ 1558 00d9 3A       		.uleb128 0x3a
+ 1559 00da 0B       		.uleb128 0xb
+ 1560 00db 3B       		.uleb128 0x3b
+ 1561 00dc 05       		.uleb128 0x5
+ 1562 00dd 49       		.uleb128 0x49
+ 1563 00de 13       		.uleb128 0x13
+ 1564 00df 3F       		.uleb128 0x3f
+ 1565 00e0 19       		.uleb128 0x19
+ 1566 00e1 3C       		.uleb128 0x3c
+ 1567 00e2 19       		.uleb128 0x19
+ 1568 00e3 00       		.byte	0
+ 1569 00e4 00       		.byte	0
+ 1570 00e5 10       		.uleb128 0x10
+ 1571 00e6 35       		.uleb128 0x35
+ 1572 00e7 00       		.byte	0
+ 1573 00e8 49       		.uleb128 0x49
+ 1574 00e9 13       		.uleb128 0x13
+ 1575 00ea 00       		.byte	0
+ 1576 00eb 00       		.byte	0
+ 1577 00ec 11       		.uleb128 0x11
+ 1578 00ed 2E       		.uleb128 0x2e
+ 1579 00ee 00       		.byte	0
+ 1580 00ef 3F       		.uleb128 0x3f
+ 1581 00f0 19       		.uleb128 0x19
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 31
+
+
+ 1582 00f1 3C       		.uleb128 0x3c
+ 1583 00f2 19       		.uleb128 0x19
+ 1584 00f3 6E       		.uleb128 0x6e
+ 1585 00f4 0E       		.uleb128 0xe
+ 1586 00f5 03       		.uleb128 0x3
+ 1587 00f6 0E       		.uleb128 0xe
+ 1588 00f7 3A       		.uleb128 0x3a
+ 1589 00f8 0B       		.uleb128 0xb
+ 1590 00f9 3B       		.uleb128 0x3b
+ 1591 00fa 0B       		.uleb128 0xb
+ 1592 00fb 00       		.byte	0
+ 1593 00fc 00       		.byte	0
+ 1594 00fd 00       		.byte	0
+ 1595              		.section	.debug_loc,"",%progbits
+ 1596              	.Ldebug_loc0:
+ 1597              	.LLST0:
+ 1598 0000 00000000 		.4byte	.LVL0
+ 1599 0004 07000000 		.4byte	.LVL1-1
+ 1600 0008 0100     		.2byte	0x1
+ 1601 000a 50       		.byte	0x50
+ 1602 000b 07000000 		.4byte	.LVL1-1
+ 1603 000f 18000000 		.4byte	.LVL4
+ 1604 0013 0100     		.2byte	0x1
+ 1605 0015 55       		.byte	0x55
+ 1606 0016 18000000 		.4byte	.LVL4
+ 1607 001a 88000000 		.4byte	.LFE64
+ 1608 001e 0400     		.2byte	0x4
+ 1609 0020 F3       		.byte	0xf3
+ 1610 0021 01       		.uleb128 0x1
+ 1611 0022 50       		.byte	0x50
+ 1612 0023 9F       		.byte	0x9f
+ 1613 0024 00000000 		.4byte	0
+ 1614 0028 00000000 		.4byte	0
+ 1615              	.LLST1:
+ 1616 002c 14000000 		.4byte	.LVL3
+ 1617 0030 1C000000 		.4byte	.LVL5
+ 1618 0034 0100     		.2byte	0x1
+ 1619 0036 50       		.byte	0x50
+ 1620 0037 00000000 		.4byte	0
+ 1621 003b 00000000 		.4byte	0
+ 1622              	.LLST2:
+ 1623 003f 18000000 		.4byte	.LVL4
+ 1624 0043 84000000 		.4byte	.LVL23
+ 1625 0047 0100     		.2byte	0x1
+ 1626 0049 55       		.byte	0x55
+ 1627 004a 00000000 		.4byte	0
+ 1628 004e 00000000 		.4byte	0
+ 1629              	.LLST3:
+ 1630 0052 18000000 		.4byte	.LVL4
+ 1631 0056 1C000000 		.4byte	.LVL5
+ 1632 005a 0200     		.2byte	0x2
+ 1633 005c 30       		.byte	0x30
+ 1634 005d 9F       		.byte	0x9f
+ 1635 005e 1C000000 		.4byte	.LVL5
+ 1636 0062 84000000 		.4byte	.LVL23
+ 1637 0066 0100     		.2byte	0x1
+ 1638 0068 54       		.byte	0x54
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 32
+
+
+ 1639 0069 00000000 		.4byte	0
+ 1640 006d 00000000 		.4byte	0
+ 1641              	.LLST4:
+ 1642 0071 00000000 		.4byte	.LVL24
+ 1643 0075 07000000 		.4byte	.LVL25-1
+ 1644 0079 0100     		.2byte	0x1
+ 1645 007b 50       		.byte	0x50
+ 1646 007c 07000000 		.4byte	.LVL25-1
+ 1647 0080 18000000 		.4byte	.LVL28
+ 1648 0084 0100     		.2byte	0x1
+ 1649 0086 55       		.byte	0x55
+ 1650 0087 18000000 		.4byte	.LVL28
+ 1651 008b 88000000 		.4byte	.LFE65
+ 1652 008f 0400     		.2byte	0x4
+ 1653 0091 F3       		.byte	0xf3
+ 1654 0092 01       		.uleb128 0x1
+ 1655 0093 50       		.byte	0x50
+ 1656 0094 9F       		.byte	0x9f
+ 1657 0095 00000000 		.4byte	0
+ 1658 0099 00000000 		.4byte	0
+ 1659              	.LLST5:
+ 1660 009d 14000000 		.4byte	.LVL27
+ 1661 00a1 1C000000 		.4byte	.LVL29
+ 1662 00a5 0100     		.2byte	0x1
+ 1663 00a7 50       		.byte	0x50
+ 1664 00a8 00000000 		.4byte	0
+ 1665 00ac 00000000 		.4byte	0
+ 1666              	.LLST6:
+ 1667 00b0 18000000 		.4byte	.LVL28
+ 1668 00b4 84000000 		.4byte	.LVL47
+ 1669 00b8 0100     		.2byte	0x1
+ 1670 00ba 55       		.byte	0x55
+ 1671 00bb 00000000 		.4byte	0
+ 1672 00bf 00000000 		.4byte	0
+ 1673              	.LLST7:
+ 1674 00c3 18000000 		.4byte	.LVL28
+ 1675 00c7 1C000000 		.4byte	.LVL29
+ 1676 00cb 0200     		.2byte	0x2
+ 1677 00cd 30       		.byte	0x30
+ 1678 00ce 9F       		.byte	0x9f
+ 1679 00cf 1C000000 		.4byte	.LVL29
+ 1680 00d3 84000000 		.4byte	.LVL47
+ 1681 00d7 0100     		.2byte	0x1
+ 1682 00d9 54       		.byte	0x54
+ 1683 00da 00000000 		.4byte	0
+ 1684 00de 00000000 		.4byte	0
+ 1685              		.section	.debug_aranges,"",%progbits
+ 1686 0000 2C000000 		.4byte	0x2c
+ 1687 0004 0200     		.2byte	0x2
+ 1688 0006 00000000 		.4byte	.Ldebug_info0
+ 1689 000a 04       		.byte	0x4
+ 1690 000b 00       		.byte	0
+ 1691 000c 0000     		.2byte	0
+ 1692 000e 0000     		.2byte	0
+ 1693 0010 00000000 		.4byte	.LFB64
+ 1694 0014 88000000 		.4byte	.LFE64-.LFB64
+ 1695 0018 00000000 		.4byte	.LFB65
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 33
+
+
+ 1696 001c 88000000 		.4byte	.LFE65-.LFB65
+ 1697 0020 00000000 		.4byte	.LFB66
+ 1698 0024 10010000 		.4byte	.LFE66-.LFB66
+ 1699 0028 00000000 		.4byte	0
+ 1700 002c 00000000 		.4byte	0
+ 1701              		.section	.debug_ranges,"",%progbits
+ 1702              	.Ldebug_ranges0:
+ 1703 0000 00000000 		.4byte	.LFB64
+ 1704 0004 88000000 		.4byte	.LFE64
+ 1705 0008 00000000 		.4byte	.LFB65
+ 1706 000c 88000000 		.4byte	.LFE65
+ 1707 0010 00000000 		.4byte	.LFB66
+ 1708 0014 10010000 		.4byte	.LFE66
+ 1709 0018 00000000 		.4byte	0
+ 1710 001c 00000000 		.4byte	0
+ 1711              		.section	.debug_line,"",%progbits
+ 1712              	.Ldebug_line0:
+ 1713 0000 1D030000 		.section	.debug_str,"MS",%progbits,1
+ 1713      02007801 
+ 1713      00000201 
+ 1713      FB0E0D00 
+ 1713      01010101 
+ 1714              	.LASF9:
+ 1715 0000 5F5F696E 		.ascii	"__int32_t\000"
+ 1715      7433325F 
+ 1715      7400
+ 1716              	.LASF3:
+ 1717 000a 73686F72 		.ascii	"short unsigned int\000"
+ 1717      7420756E 
+ 1717      7369676E 
+ 1717      65642069 
+ 1717      6E7400
+ 1718              	.LASF26:
+ 1719 001d 50574D5F 		.ascii	"PWM_2_WriteCompare\000"
+ 1719      325F5772 
+ 1719      69746543 
+ 1719      6F6D7061 
+ 1719      726500
+ 1720              	.LASF17:
+ 1721 0030 636F7272 		.ascii	"correctedTurn\000"
+ 1721      65637465 
+ 1721      64547572 
+ 1721      6E00
+ 1722              	.LASF11:
+ 1723 003e 666C6F61 		.ascii	"float\000"
+ 1723      7400
+ 1724              	.LASF1:
+ 1725 0044 756E7369 		.ascii	"unsigned char\000"
+ 1725      676E6564 
+ 1725      20636861 
+ 1725      7200
+ 1726              	.LASF29:
+ 1727 0052 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1727      43313120 
+ 1727      352E342E 
+ 1727      31203230 
+ 1727      31363036 
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 34
+
+
+ 1728 0085 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1728      20726576 
+ 1728      6973696F 
+ 1728      6E203233 
+ 1728      37373135 
+ 1729 00b8 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1729      66756E63 
+ 1729      74696F6E 
+ 1729      2D736563 
+ 1729      74696F6E 
+ 1730              	.LASF5:
+ 1731 00e0 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1731      20756E73 
+ 1731      69676E65 
+ 1731      6420696E 
+ 1731      7400
+ 1732              	.LASF23:
+ 1733 00f2 50574D5F 		.ascii	"PWM_1_Start\000"
+ 1733      315F5374 
+ 1733      61727400 
+ 1734              	.LASF33:
+ 1735 00fe 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1735      52784275 
+ 1735      66666572 
+ 1735      00
+ 1736              	.LASF20:
+ 1737 010b 64656772 		.ascii	"degrees\000"
+ 1737      65657300 
+ 1738              	.LASF12:
+ 1739 0113 646F7562 		.ascii	"double\000"
+ 1739      6C6500
+ 1740              	.LASF24:
+ 1741 011a 50574D5F 		.ascii	"PWM_2_Start\000"
+ 1741      325F5374 
+ 1741      61727400 
+ 1742              	.LASF32:
+ 1743 0126 6D61696E 		.ascii	"main\000"
+ 1743      00
+ 1744              	.LASF25:
+ 1745 012b 50574D5F 		.ascii	"PWM_3_Start\000"
+ 1745      335F5374 
+ 1745      61727400 
+ 1746              	.LASF8:
+ 1747 0137 756E7369 		.ascii	"unsigned int\000"
+ 1747      676E6564 
+ 1747      20696E74 
+ 1747      00
+ 1748              	.LASF7:
+ 1749 0144 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1749      206C6F6E 
+ 1749      6720756E 
+ 1749      7369676E 
+ 1749      65642069 
+ 1750              	.LASF16:
+ 1751 015b 61637475 		.ascii	"actualDegree\000"
+ 1751      616C4465 
+ 1751      67726565 
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 35
+
+
+ 1751      00
+ 1752              	.LASF10:
+ 1753 0168 696E7433 		.ascii	"int32_t\000"
+ 1753      325F7400 
+ 1754              	.LASF15:
+ 1755 0170 73697A65 		.ascii	"sizetype\000"
+ 1755      74797065 
+ 1755      00
+ 1756              	.LASF27:
+ 1757 0179 50574D5F 		.ascii	"PWM_1_WriteCompare\000"
+ 1757      315F5772 
+ 1757      69746543 
+ 1757      6F6D7061 
+ 1757      726500
+ 1758              	.LASF6:
+ 1759 018c 6C6F6E67 		.ascii	"long long int\000"
+ 1759      206C6F6E 
+ 1759      6720696E 
+ 1759      7400
+ 1760              	.LASF30:
+ 1761 019a 6D61696E 		.ascii	"main.c\000"
+ 1761      2E6300
+ 1762              	.LASF19:
+ 1763 01a1 73746570 		.ascii	"stepperCCW\000"
+ 1763      70657243 
+ 1763      435700
+ 1764              	.LASF21:
+ 1765 01ac 53746570 		.ascii	"Stepper_Write\000"
+ 1765      7065725F 
+ 1765      57726974 
+ 1765      6500
+ 1766              	.LASF2:
+ 1767 01ba 73686F72 		.ascii	"short int\000"
+ 1767      7420696E 
+ 1767      7400
+ 1768              	.LASF31:
+ 1769 01c4 433A5C55 		.ascii	"C:\\Users\\sinow\\Documents\\PSoC Creator\\Lab 5 - "
+ 1769      73657273 
+ 1769      5C73696E 
+ 1769      6F775C44 
+ 1769      6F63756D 
+ 1770 01f2 46696E61 		.ascii	"Final Project\\Demo.cydsn\000"
+ 1770      6C205072 
+ 1770      6F6A6563 
+ 1770      745C4465 
+ 1770      6D6F2E63 
+ 1771              	.LASF4:
+ 1772 020b 6C6F6E67 		.ascii	"long int\000"
+ 1772      20696E74 
+ 1772      00
+ 1773              	.LASF13:
+ 1774 0214 63686172 		.ascii	"char\000"
+ 1774      00
+ 1775              	.LASF14:
+ 1776 0219 6C6F6E67 		.ascii	"long double\000"
+ 1776      20646F75 
+ 1776      626C6500 
+ARM GAS  C:\Users\sinow\AppData\Local\Temp\ccEqUh1p.s 			page 36
+
+
+ 1777              	.LASF28:
+ 1778 0225 50574D5F 		.ascii	"PWM_3_WriteCompare\000"
+ 1778      335F5772 
+ 1778      69746543 
+ 1778      6F6D7061 
+ 1778      726500
+ 1779              	.LASF0:
+ 1780 0238 7369676E 		.ascii	"signed char\000"
+ 1780      65642063 
+ 1780      68617200 
+ 1781              	.LASF22:
+ 1782 0244 43794465 		.ascii	"CyDelay\000"
+ 1782      6C617900 
+ 1783              	.LASF18:
+ 1784 024c 73746570 		.ascii	"stepperCW\000"
+ 1784      70657243 
+ 1784      5700
+ 1785              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
